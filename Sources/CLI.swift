@@ -94,7 +94,16 @@ struct LocateTest: AsyncParsableCommand {
             throw OutputError(message: "Could not locate test")
         }
 
-        print(location)
+        print("""
+        ---
+        
+        testIdentifierString: \(testIdentifierString)
+        testCaseName:         \(testCaseName)
+        path:                 \(location.path)
+        line:                 \(location.line)
+        column:               \(location.utf8Column)
+        module:               \(location.moduleName)
+        """)
     }
 }
 
@@ -117,6 +126,11 @@ struct FileOwners: AsyncParsableCommand {
             throw OutputError(message: "Owners not found.")
         }
 
-        print(ownedFile.owners.formatted(.list(type: .and)))
+        print("""
+        ---
+        
+        file:   \(filePath)
+        owners: \(ownedFile.owners.formatted(.list(type: .and)))
+        """)
     }
 }
