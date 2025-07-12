@@ -7,7 +7,9 @@ public struct OwnedFile: Codable {
 }
 
 /// Uses github.com `CODEOWNERS` to return a list of files and corresponding owners
-public func resolveCodeOwners(repositoryURL: URL) -> [OwnedFile] {
+public func resolveCodeOwners(repositoryURL: URL) async -> [OwnedFile] {
+    log("Resolving file owners... ")
+
     let codeOwnersURL = repositoryURL.appending(path: "/.github/CODEOWNERS")
 
     // Process CODEOWNERS File
@@ -35,6 +37,8 @@ public func resolveCodeOwners(repositoryURL: URL) -> [OwnedFile] {
             /// Use code owner patterns to resolve a fileURL to an `OwnedFile`
             resolveToOwnedFile(fileURL: $0, codeOwners: codeOwnersPatterns ?? [])
         }
+
+    log("Resolving file owners... ✓")
 
     return ownedFiles ?? []
 }

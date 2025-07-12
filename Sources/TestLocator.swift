@@ -6,7 +6,9 @@ public extension IndexStoreDB {
     /// - Parameters:
     ///   - storePath: The path to the store. Located in derivedData folder at `Index.noindex/DataStore`
     ///   - libraryPath: The path to `libIndexStore.dylib
-    convenience init(storePath: String, libraryPath: String) throws {
+    convenience init(storePath: String, libraryPath: String) async throws {
+        log("Initializing index store database...")
+
         let temporaryDatabaseURL = FileManager.default
             .temporaryDirectory
             .appendingPathComponent("com.xcresultowners.database")
@@ -19,6 +21,8 @@ public extension IndexStoreDB {
             library: .init(dylibPath: libraryPath),
             waitUntilDoneInitializing: true
         )
+
+        log("Initializing index store database... ✓")
     }
 
     /// Returns the location of the test case
@@ -80,4 +84,11 @@ extension [SymbolOccurrence] {
             .map(\.occurrence)
             .first
     }
+}
+
+/// Log to standard error
+private func log(_ message: String) {
+    let datedMessage = Date().formatted(.iso8601) + " " + message + "\n"
+    let datedMessageData = Data(datedMessage.utf8)
+    try? FileHandle.standardError.write(contentsOf: datedMessageData)
 }

@@ -2,7 +2,7 @@ import Foundation
 import ArgumentParser
 import IndexStoreDB
 
-@main struct xcresultowners: ParsableCommand {
+@main struct xcresultowners: AsyncParsableCommand {
     enum OutputFormat: String, ExpressibleByArgument {
         case json
         case markdown
@@ -23,21 +23,20 @@ import IndexStoreDB
     @Argument(help: "Path to the xcresult summary obtained using `xcresulttool get test-results summary`")
     var xcResultJSONPath: String
 
-    mutating func run() throws {
+    mutating func run() async throws {
         let repositoryURL = URL(fileURLWithPath: repositoryPath)
         let xcResultJSONURL = URL(fileURLWithPath: xcResultJSONPath)
 
-        log("Step 1: Process CODEOWNERS file and generate a list of files with owners")
-        let ownedFilesList = resolveCodeOwners(repositoryURL: repositoryURL)
+        async let _ownedFilesList = resolveCodeOwners(repositoryURL: repositoryURL)
+        async let _indexStoreDB = IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
 
-        log("Step 2: Initialize IndexStoreDB with derive data store")
-        let indexStoreDB = try IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
+        let (ownedFilesList, indexStoreDB) = try await (_ownedFilesList, _indexStoreDB)
 
-        log("Step 3: Decode json from .xcresult file")
+        log("Decoding XCResult... ")
         let data = try Data(contentsOf: xcResultJSONURL)
         let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: data)
 
-        log("Step 4: Resolve the file location and owners of each failure")
+        log("Generating Report...")
         let ownedFailures = xcResultSummary.testFailures.compactMap { failure in
             let location = indexStoreDB.locate(
                 testCaseName: failure.testName,
@@ -61,7 +60,6 @@ import IndexStoreDB
             return Report.OwnedFailure(xcFailure: failure, owners: owners)
         }
 
-        log("Step 5: Create a report and print as either markdown or json")
         let report = Report(summary: xcResultSummary, failures: ownedFailures)
 
         if format == .json {
