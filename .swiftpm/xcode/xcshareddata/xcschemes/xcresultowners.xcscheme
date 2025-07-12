@@ -60,7 +60,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/shammi.didla/Downloads/marathon-2.xcresult.json"
+            argument = "/Users/shammi.didla/xcresults/xing-2.xcresult.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
