@@ -2,7 +2,20 @@ import Foundation
 import ArgumentParser
 import IndexStoreDB
 
-@main struct xcresultowners: AsyncParsableCommand {
+@main struct XCResultOwners: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName:"xcresultowners",
+        abstract: "A utility that locates test cases and their owners",
+        subcommands: [
+            GenerateReport.self,
+            LocateTest.self,
+            FileOwners.self
+        ],
+        defaultSubcommand: GenerateReport.self
+    )
+}
+
+struct GenerateReport: AsyncParsableCommand {
     enum OutputFormat: String, ExpressibleByArgument {
         case json
         case markdown
@@ -51,5 +64,59 @@ import IndexStoreDB
         } else {
             print(output.markdownFormatted())
         }
+    }
+}
+
+struct LocateTest: AsyncParsableCommand {
+    @Option(name: .shortAndLong,help: "Path to libIndexStore.dylib. Use can pass in  $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun")
+    var libraryPath: String = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib"
+
+    @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of the project")
+    var storePath: String
+
+    @Argument(help: "The `testIdentifierString` from a xcresults file")
+    var testIdentifierString: String
+
+    mutating func run() async throws {
+        let indexStoreDB = try await IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
+
+        guard let testCaseName = URL(string: testIdentifierString)?.lastPathComponent else {
+            throw OutputError(message: "testCaseName could not be determined")
+        }
+
+        let location = indexStoreDB.locate(
+            testCaseName: testCaseName,
+            testIdentifier: testIdentifierString,
+            moduleName: nil
+        )
+
+        guard let location else {
+            throw OutputError(message: "Could not locate test")
+        }
+
+        print(location)
+    }
+}
+
+struct FileOwners: AsyncParsableCommand {
+    @Option(name: .shortAndLong,help: "Path to the repository that contains github.com CODEOWNERS and source files")
+    var repositoryPath: String
+
+    @Argument(help: "Path to a file in the repository")
+    var filePath: String
+
+    mutating func run() async throws {
+        let repositoryURL = URL(fileURLWithPath: repositoryPath)
+
+        let ownedFiles = await resolveFileOwners(repositoryURL: repositoryURL)
+
+        let fileURL = URL(fileURLWithPath: filePath)
+        let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
+
+        guard let ownedFile else {
+            throw OutputError(message: "Owners not found.")
+        }
+
+        print(ownedFile.owners.formatted(.list(type: .and)))
     }
 }

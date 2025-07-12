@@ -6,6 +6,10 @@ struct Output: Codable {
     let failures: [OwnedFailure]
 }
 
+struct OutputError: Error {
+    let message: String
+}
+
 // MARK: - Output Formats
 
 extension Output {

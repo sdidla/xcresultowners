@@ -3,7 +3,7 @@ import IndexStoreDB
 
 extension IndexStoreDB {
     /// Returns the location of the test case
-    func locate(testCaseName: String, testIdentifier: String, moduleName: String) -> SymbolLocation? {
+    func locate(testCaseName: String, testIdentifier: String, moduleName: String?) -> SymbolLocation? {
         canonicalOccurrences(
             containing: testCaseName,
             anchorStart: true,
@@ -19,11 +19,18 @@ extension IndexStoreDB {
 
 extension [SymbolOccurrence] {
     /// Returns a filtered array containing occurrences of unit test definitions in a module
-    func unitTestDefinitions(inModule moduleName: String) -> [SymbolOccurrence] {
+    func unitTestDefinitions(inModule moduleName: String?) -> [SymbolOccurrence] {
         filter {
             $0.symbol.properties.contains(.unitTest) &&
-            $0.roles.contains(.definition) &&
-            $0.location.moduleName == moduleName
+            $0.roles.contains(.definition)
+        }
+        .filter {
+            // further filter by module name if provided
+            if let moduleName {
+                moduleName == $0.location.moduleName
+            } else {
+                true
+            }
         }
     }
 
