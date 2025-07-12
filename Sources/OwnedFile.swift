@@ -1,14 +1,14 @@
 import Foundation
 
 /// Represent a file with assigned owners from the `CODEOWNERS` file
-public struct OwnedFile: Codable {
+struct OwnedFile: Codable {
     let fileURL: URL
     let owners: [String]
 }
 
 /// Uses github.com `CODEOWNERS` to return a list of files and corresponding owners
-public func resolveCodeOwners(repositoryURL: URL) async -> [OwnedFile] {
-    log("Resolving file owners... ")
+func resolveFileOwners(repositoryURL: URL) async -> [OwnedFile] {
+    logToStandardError("Resolving file owners... ")
 
     let codeOwnersURL = repositoryURL.appending(path: "/.github/CODEOWNERS")
 
@@ -38,7 +38,7 @@ public func resolveCodeOwners(repositoryURL: URL) async -> [OwnedFile] {
             resolveToOwnedFile(fileURL: $0, codeOwners: codeOwnersPatterns ?? [])
         }
 
-    log("Resolving file owners... ✓")
+    logToStandardError("Resolving file owners... ✓")
 
     return ownedFiles ?? []
 }
@@ -54,7 +54,7 @@ private func resolveToOwnedFile(fileURL: URL, codeOwners: [CodeOwnerPattern]) ->
     }
 
     guard let owners = match?.owners else {
-        log("File with no matching owner: \(fileURL.absoluteString)")
+        logToStandardError("File with no matching owner: \(fileURL.absoluteString)")
         return nil
     }
 
@@ -84,10 +84,10 @@ private func makeCodeOwnerPattern(line: String, repositoryURL: URL) -> CodeOwner
     } else if patternPath.hasSuffix("/")  {
         finalPattern = patternPath + "*"
     } else if patternURL.lastPathComponent.contains(".") == false {
-        log("Assuming directory pattern: \(pattern)")
+        logToStandardError("Assuming directory pattern: \(pattern)")
         finalPattern = patternPath + "/*"
     } else {
-        log("Assuming file pattern: \(pattern)")
+        logToStandardError("Assuming file pattern: \(pattern)")
         finalPattern = patternPath
     }
 
@@ -99,11 +99,4 @@ private func makeCodeOwnerPattern(line: String, repositoryURL: URL) -> CodeOwner
 private struct CodeOwnerPattern: Codable {
     let pattern: String
     let owners: [String]
-}
-
-/// Log to standard error
-private func log(_ message: String) {
-    let datedMessage = Date().formatted(.iso8601) + " " + message + "\n"
-    let datedMessageData = Data(datedMessage.utf8)
-    try? FileHandle.standardError.write(contentsOf: datedMessageData)
 }
