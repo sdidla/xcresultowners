@@ -9,8 +9,8 @@ struct LocateTests {
     @Test func locateTopLevelSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
             testCaseName: "topLevelTest()",
-            testIdentifier: "ModuleATests/topLevelTest()",
-            moduleName: nil
+            testIdentifier: "topLevelTest()",
+            moduleName: "ModuleATests"
         )
 
         #expect(location?.moduleName == "ModuleATests")
@@ -21,8 +21,8 @@ struct LocateTests {
     @Test func locateSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
             testCaseName: "foo()",
-            testIdentifier: "ModuleATests/SampleSwiftTests/foo()",
-            moduleName: nil
+            testIdentifier: "SampleSwiftTests/foo()",
+            moduleName: "ModuleATests"
         )
 
         #expect(location?.moduleName == "ModuleATests")
@@ -33,8 +33,8 @@ struct LocateTests {
     @Test func locateNestedSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
             testCaseName: "foo()",
-            testIdentifier: "ModuleATests/SampleSwiftTests/NestedSwiftTests/foo()",
-            moduleName: nil
+            testIdentifier: "SampleSwiftTests/NestedSwiftTests/foo()",
+            moduleName: "ModuleATests"
         )
 
         #expect(location?.moduleName == "ModuleATests")
@@ -45,8 +45,8 @@ struct LocateTests {
     @Test func locateSwiftTestWithTestPrefix() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
             testCaseName: "testFoo()",
-            testIdentifier: "ModuleATests/SampleSwiftTests/testFoo()",
-            moduleName: nil
+            testIdentifier: "SampleSwiftTests/testFoo()",
+            moduleName: "ModuleATests"
         )
 
         #expect(location?.moduleName == "ModuleATests")
