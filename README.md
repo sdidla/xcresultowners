@@ -19,7 +19,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 
 ```
 
-#### Find owners of files
+#### Find owners of files using `CODEOWNERS`
 ```shell
  swift run xcresultowners file-owners \
    --repository-path <path-to-repository> \
@@ -28,7 +28,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
    ...
 ```
 
-#### Locate tests using test identifiers
+#### Locate tests using test identifiers using `IndexStoreDB`
 ```shell
  swift run xcresultowners locate-tests \
    --library-path  $(xcodebuild -find-library libIndexStore.dylib) \
@@ -38,7 +38,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
    ...
 ```
 
-#### Comprehensive usage help
+#### Comprehensive USAGE details
 ```shell
 swift run xcresultowners help
 ```
