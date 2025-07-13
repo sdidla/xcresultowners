@@ -17,6 +17,10 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "IndexStoreDB", package: "indexstore-db")
             ]
+        ),
+        .testTarget(
+            name: "Tests",
+            dependencies: ["xcresultowners"]
         )
     ]
 )
