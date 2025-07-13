@@ -35,7 +35,7 @@ func resolveFileOwners(repositoryURL: URL) async throws -> [OwnedFile] {
         }
         .compactMap {
             /// Use code owner patterns to resolve a fileURL to an `OwnedFile`
-            resolveToOwnedFile(fileURL: $0, codeOwners: codeOwnersPatterns ?? [])
+            resolveToOwnedFile(fileURL: $0, codeOwners: codeOwnersPatterns)
         }
 
     logToStandardError("Resolving file owners... ✓")
