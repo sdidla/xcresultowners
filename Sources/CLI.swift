@@ -8,7 +8,7 @@ import IndexStoreDB
         abstract: "A utility that locates test cases and their owners",
         subcommands: [
             GenerateReport.self,
-            LocateTest.self,
+            LocateTests.self,
             FileOwners.self
         ],
         defaultSubcommand: GenerateReport.self
@@ -24,10 +24,10 @@ struct GenerateReport: AsyncParsableCommand {
     @Option(name: .shortAndLong, help: "Output format")
     var format: OutputFormat = .markdown
 
-    @Option(name: .shortAndLong,help: "Path to libIndexStore.dylib. Use can pass in  $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun")
+    @Option(name: .shortAndLong,help: "Path to libIndexStore.dylib. Use $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun.")
     var libraryPath: String = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib"
 
-    @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of the project")
+    @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of an Xcode project")
     var storePath: String
 
     @Option(name: .shortAndLong,help: "Path to the repository that contains github.com CODEOWNERS and source files")
@@ -67,43 +67,49 @@ struct GenerateReport: AsyncParsableCommand {
     }
 }
 
-struct LocateTest: AsyncParsableCommand {
+struct LocateTests: AsyncParsableCommand {
     @Option(name: .shortAndLong,help: "Path to libIndexStore.dylib. Use can pass in  $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun")
     var libraryPath: String = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib"
 
     @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of the project")
     var storePath: String
 
-    @Argument(help: "The `testIdentifierString` from a xcresults file")
-    var testIdentifierString: String
+    @Argument(help: "A list of `testIdentifierString` from an xcresults file")
+    var testIdentifierStrings: [String]
 
     mutating func run() async throws {
         let indexStoreDB = try await IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
 
-        guard let testCaseName = URL(string: testIdentifierString)?.lastPathComponent else {
-            throw OutputError(message: "testCaseName could not be determined")
+        let result = testIdentifierStrings.compactMap { identifier -> [String: Any]? in
+            guard let testCaseName = URL(string: identifier)?.lastPathComponent else {
+                return nil
+            }
+
+            let location = indexStoreDB.locate(
+                testCaseName: testCaseName,
+                testIdentifier: identifier,
+                moduleName: nil
+            )
+
+            guard let location else {
+                return nil
+            }
+
+            return [
+                "testIdentifierString": identifier,
+                "testCaseName":         testCaseName,
+                "path":                 location.path,
+                "line":                 location.line,
+                "column":               location.utf8Column,
+                "module":               location.moduleName,
+
+            ]
         }
 
-        let location = indexStoreDB.locate(
-            testCaseName: testCaseName,
-            testIdentifier: testIdentifierString,
-            moduleName: nil
-        )
-
-        guard let location else {
-            throw OutputError(message: "Could not locate test")
-        }
-
-        print("""
-        ---
-        
-        testIdentifierString: \(testIdentifierString)
-        testCaseName:         \(testCaseName)
-        path:                 \(location.path)
-        line:                 \(location.line)
-        column:               \(location.utf8Column)
-        module:               \(location.moduleName)
-        """)
+        let options: JSONSerialization.WritingOptions = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        let data = try JSONSerialization.data(withJSONObject: result, options: options)
+        let json = String(decoding: data, as: UTF8.self)
+        print(json)
     }
 }
 
@@ -111,7 +117,7 @@ struct FileOwners: AsyncParsableCommand {
     @Option(name: .shortAndLong,help: "Path to the repository that contains github.com CODEOWNERS and source files")
     var repositoryPath: String
 
-    @Argument(help: "Paths to a file in the repository")
+    @Argument(help: "Paths to files in the repository")
     var filePaths: [String]
 
     mutating func run() async throws {
@@ -125,7 +131,7 @@ struct FileOwners: AsyncParsableCommand {
         }
 
         let encorder = JSONEncoder()
-        encorder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        encorder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         let data = try encorder.encode(result)
         let json = String(decoding: data, as: UTF8.self)
         print(json)
