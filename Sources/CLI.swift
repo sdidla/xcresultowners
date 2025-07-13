@@ -121,7 +121,7 @@ struct FileOwners: AsyncParsableCommand {
 
     mutating func run() async throws {
         let repositoryURL = URL(fileURLWithPath: repositoryPath)
-        let ownedFiles = await resolveFileOwners(repositoryURL: repositoryURL)
+        let ownedFiles = try await resolveFileOwners(repositoryURL: repositoryURL)
 
         let result = filePaths.map { filePath in
             let fileURL = URL(fileURLWithPath: filePath)
