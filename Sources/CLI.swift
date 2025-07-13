@@ -111,26 +111,23 @@ struct FileOwners: AsyncParsableCommand {
     @Option(name: .shortAndLong,help: "Path to the repository that contains github.com CODEOWNERS and source files")
     var repositoryPath: String
 
-    @Argument(help: "Path to a file in the repository")
-    var filePath: String
+    @Argument(help: "Paths to a file in the repository")
+    var filePaths: [String]
 
     mutating func run() async throws {
         let repositoryURL = URL(fileURLWithPath: repositoryPath)
-
         let ownedFiles = await resolveFileOwners(repositoryURL: repositoryURL)
 
-        let fileURL = URL(fileURLWithPath: filePath)
-        let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
-
-        guard let ownedFile else {
-            throw OutputError(message: "Owners not found.")
+        let result = filePaths.map { filePath in
+            let fileURL = URL(fileURLWithPath: filePath)
+            let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
+            return ownedFile ?? OwnedFile(fileURL: fileURL, owners: [])
         }
 
-        print("""
-        ---
-        
-        file:   \(filePath)
-        owners: \(ownedFile.owners.formatted(.list(type: .and)))
-        """)
+        let encorder = JSONEncoder()
+        encorder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let data = try encorder.encode(result)
+        let json = String(decoding: data, as: UTF8.self)
+        print(json)
     }
 }
