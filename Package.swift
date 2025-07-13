@@ -8,7 +8,7 @@ let package = Package(
     platforms: [.macOS(.v15)],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
-        .package(url: "https://github.com/apple/indexstore-db", branch: "swift-6.1.1-RELEASE")
+        .package(url: "https://github.com/apple/indexstore-db", revision: "swift-6.1.1-RELEASE")
     ],
     targets: [
         .executableTarget(
