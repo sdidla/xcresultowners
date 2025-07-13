@@ -12,7 +12,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
  # Use xcresultowners to supplement code owners
  swift run xcresultowners \
    --library-path      $(xcodebuild -find-library libIndexStore.dylib) \
-   --repository-path   <path-to-repository-containing-code-and-CODEOWNERS> \
+   --repository-path   <path-to-repository-containing-code-and-codeowners> \
    --store-path        <path-to-derived-data-directory-of-target>" + "/Index.noindex/DataStore" \
    --format            <json|markdown>
    xcresult.json
@@ -22,7 +22,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 #### Find owners of files
 ```shell
  swift run xcresultowners file-owners \
-   --repository-path <path-to-repository-containing-code-and-CODEOWNERS> \
+   --repository-path <path-to-repository> \
    <path-to-file> \
    <path-to-file>
    ...
@@ -31,8 +31,8 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 #### Locate tests using test identifiers
 ```shell
  swift run xcresultowners locate-tests \
-   --library-path      $(xcodebuild -find-library libIndexStore.dylib) \
-   --store-path        <path-to-derived-data-directory-of-target> + "/Index.noindex/DataStore" \
+   --library-path  $(xcodebuild -find-library libIndexStore.dylib) \
+   --store-path    <path-to-derived-data-directory-of-target> + "/Index.noindex/DataStore" \
    <test-identifier-from-xcresults-file> \
    <test-identifier-from-xcresults-file>
    ...
