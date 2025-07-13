@@ -102,7 +102,6 @@ struct LocateTests: AsyncParsableCommand {
                 "line":                 location.line,
                 "column":               location.utf8Column,
                 "module":               location.moduleName,
-
             ]
         }
 
