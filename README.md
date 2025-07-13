@@ -33,7 +33,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 
 ## Road to v1.0
 
+- [x] Implement a sub-command or separate executable for locating a test with a given test-identifier
+- [x] Implement a sub-command or separate executable for listing owners of a file
 - [ ] Add unit tests
-- [ ] Implement a sub-command or separate executable for locating a test with a given test-identifier
-- [ ] Implement a sub-command or separate executable for listing owners of a file
 - [ ] Improve documentation
