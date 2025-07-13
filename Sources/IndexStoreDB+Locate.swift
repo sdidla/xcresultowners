@@ -21,7 +21,6 @@ extension [SymbolOccurrence] {
     /// Returns a filtered array containing occurrences of unit test definitions in a module
     func unitTestDefinitions(inModule moduleName: String?) -> [SymbolOccurrence] {
         filter {
-            $0.symbol.properties.contains(.unitTest) &&
             $0.roles.contains(.definition)
         }
         .filter {
