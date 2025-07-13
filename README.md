@@ -4,6 +4,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 
 ## Usage
 
+#### Supplement xcresult summary with owners
 ```shell
  # Genrate a json file with xcresult summary
  xcrun xcresulttool get test-results summary --path <path-to-xcresult-bundle> > xcresult.json
@@ -12,11 +13,34 @@ This project supplements the test results summary produced by [`xcresulttool`](h
  swift run xcresultowners \
    --library-path      $(xcodebuild -find-library libIndexStore.dylib) \
    --repository-path   <path-to-repository-containing-code-and-CODEOWNERS> \
-   --store-path        "<path-to-derived-data-directory-of-target>/Index.noindex/DataStore" \
+   --store-path        <path-to-derived-data-directory-of-target>" + "/Index.noindex/DataStore" \
    --format            <json|markdown>
    xcresult.json
 
+```
 
+#### Find owners of files
+```shell
+ swift run xcresultowners file-owners \
+   --repository-path <path-to-repository-containing-code-and-CODEOWNERS> \
+   <path-to-file> \
+   <path-to-file>
+   ...
+```
+
+#### Locate tests using test identifiers
+```shell
+ swift run xcresultowners locate-tests \
+   --library-path      $(xcodebuild -find-library libIndexStore.dylib) \
+   --store-path        <path-to-derived-data-directory-of-target> + "/Index.noindex/DataStore" \
+   <test-identifier-from-xcresults-file> \
+   <test-identifier-from-xcresults-file>
+   ...
+```
+
+#### Comprehensive usage help
+```shell
+swift run xcresultowners help
 ```
 
 ## Implementation Details
@@ -35,5 +59,5 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 
 - [x] Implement a sub-command or separate executable for locating a test with a given test-identifier
 - [x] Implement a sub-command or separate executable for listing owners of a file
+- [x] Improve documentation
 - [ ] Add unit tests
-- [ ] Improve documentation
