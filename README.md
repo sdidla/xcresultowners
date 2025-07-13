@@ -28,7 +28,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
    ...
 ```
 
-#### Locate tests using test identifiers using `IndexStoreDB`
+#### Locate tests using `IndexStoreDB`
 ```shell
  swift run xcresultowners locate-tests \
    --library-path  $(xcodebuild -find-library libIndexStore.dylib) \
