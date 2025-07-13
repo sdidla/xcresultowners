@@ -1,7 +1,7 @@
 import Foundation
 import IndexStoreDB
 
-extension IndexStoreDB {
+public extension IndexStoreDB {
     /// Returns the location of the test case
     func locate(testCaseName: String, testIdentifier: String, moduleName: String?) -> SymbolLocation? {
         canonicalOccurrences(

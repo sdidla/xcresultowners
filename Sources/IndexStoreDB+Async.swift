@@ -1,7 +1,7 @@
 import Foundation
 import IndexStoreDB
 
-extension IndexStoreDB {
+public extension IndexStoreDB {
     /// Initializes IndexStoreDB with a temporary directory.
     /// - Parameters:
     ///   - storePath: The path to the store. Located in derivedData folder at `Index.noindex/DataStore`

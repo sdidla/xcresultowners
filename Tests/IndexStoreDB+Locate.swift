@@ -1,17 +1,17 @@
 import Testing
 import Foundation
-import IndexStoreDB
-@testable import xcresultowners
+import xcresultowners
+@preconcurrency import IndexStoreDB
 
-@Suite(.serialized)
+@Suite(.indexStoreDB)
 struct LocateTests {
+
     @Test func locateTopLevelSwiftTest() async throws {
-        let location = try await makeIndexStoreDB()
-            .locate(
-                testCaseName: "topLevelTest()",
-                testIdentifier: "ModuleATests/topLevelTest()",
-                moduleName: nil
-            )
+        let location = IndexStoreDB.suiteShared?.locate(
+            testCaseName: "topLevelTest()",
+            testIdentifier: "ModuleATests/topLevelTest()",
+            moduleName: nil
+        )
 
         #expect(location?.moduleName == "ModuleATests")
         #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
@@ -19,12 +19,11 @@ struct LocateTests {
     }
 
     @Test func locateSwiftTest() async throws {
-        let location = try await makeIndexStoreDB()
-            .locate(
-                testCaseName: "foo()",
-                testIdentifier: "ModuleATests/SampleSwiftTests/foo()",
-                moduleName: nil
-            )
+        let location = IndexStoreDB.suiteShared?.locate(
+            testCaseName: "foo()",
+            testIdentifier: "ModuleATests/SampleSwiftTests/foo()",
+            moduleName: nil
+        )
 
         #expect(location?.moduleName == "ModuleATests")
         #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
@@ -32,12 +31,11 @@ struct LocateTests {
     }
 
     @Test func locateNestedSwiftTest() async throws {
-        let location = try await makeIndexStoreDB()
-            .locate(
-                testCaseName: "foo()",
-                testIdentifier: "ModuleATests/SampleSwiftTests/NestedSwiftTests/foo()",
-                moduleName: nil
-            )
+        let location = IndexStoreDB.suiteShared?.locate(
+            testCaseName: "foo()",
+            testIdentifier: "ModuleATests/SampleSwiftTests/NestedSwiftTests/foo()",
+            moduleName: nil
+        )
 
         #expect(location?.moduleName == "ModuleATests")
         #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
@@ -45,12 +43,11 @@ struct LocateTests {
     }
 
     @Test func locateSwiftTestWithTestPrefix() async throws {
-        let location = try await makeIndexStoreDB()
-            .locate(
-                testCaseName: "testFoo()",
-                testIdentifier: "ModuleATests/SampleSwiftTests/testFoo()",
-                moduleName: nil
-            )
+        let location = IndexStoreDB.suiteShared?.locate(
+            testCaseName: "testFoo()",
+            testIdentifier: "ModuleATests/SampleSwiftTests/testFoo()",
+            moduleName: nil
+        )
 
         #expect(location?.moduleName == "ModuleATests")
         #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
@@ -58,11 +55,25 @@ struct LocateTests {
     }
 }
 
-// MARK: -
+// MARK: - IndexStoreDB.Trait
 
-func makeIndexStoreDB() async throws -> IndexStoreDB {
-    try await IndexStoreDB(
-        storePath: TestData.testProjectIndexStorePath(),
-        libraryPath: TestData.indexStoreLibraryPath()
-    )
+extension SuiteTrait where Self == IndexStoreDB.Trait {
+    static var indexStoreDB: IndexStoreDB.Trait { .init() }
+}
+
+extension IndexStoreDB {
+    @TaskLocal static var suiteShared: IndexStoreDB?
+
+    struct Trait: SuiteTrait, TestScoping {
+        func provideScope(for test: Test, testCase: Test.Case?, performing function: () async throws -> Void) async throws {
+            let indexStoreDB = try await IndexStoreDB(
+                storePath: TestData.testProjectIndexStorePath(),
+                libraryPath: TestData.indexStoreLibraryPath()
+            )
+
+            try await IndexStoreDB.$suiteShared.withValue(indexStoreDB) {
+                try await function()
+            }
+        }
+    }
 }
