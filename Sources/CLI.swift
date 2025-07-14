@@ -8,7 +8,7 @@ import IndexStoreDB
         abstract: "A utility that locates test cases and their owners",
         subcommands: [
             GenerateReport.self,
-            LocateTests.self,
+            LocateTest.self,
             FileOwners.self
         ],
         defaultSubcommand: GenerateReport.self
@@ -67,43 +67,44 @@ struct GenerateReport: AsyncParsableCommand {
     }
 }
 
-struct LocateTests: AsyncParsableCommand {
+struct LocateTest: AsyncParsableCommand {
     @Option(name: .shortAndLong,help: "Path to libIndexStore.dylib. Use can pass in  $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun")
     var libraryPath: String = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib"
 
     @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of the project")
     var storePath: String
 
-    @Argument(help: "A list of `testIdentifierString` from an xcresults file")
-    var testIdentifierStrings: [String]
+    @Argument(help: "The module where the test name defined")
+    var moduleName: String
+
+    @Argument(help: "The `testIdentifierString` from an xcresults file")
+    var testIdentifierString: String
 
     mutating func run() async throws {
         let indexStoreDB = try await IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
 
-        let result = testIdentifierStrings.compactMap { identifier -> [String: Any]? in
-            guard let testCaseName = URL(string: identifier)?.lastPathComponent else {
-                return nil
-            }
-
-            let location = indexStoreDB.locate(
-                testCaseName: testCaseName,
-                testIdentifier: identifier,
-                moduleName: nil
-            )
-
-            guard let location else {
-                return nil
-            }
-
-            return [
-                "testIdentifierString": identifier,
-                "testCaseName":         testCaseName,
-                "path":                 location.path,
-                "line":                 location.line,
-                "column":               location.utf8Column,
-                "module":               location.moduleName,
-            ]
+        guard let testCaseName = URL(string: testIdentifierString)?.lastPathComponent else {
+            throw OutputError(message: "Invalid testIdentifierString")
         }
+
+        let location = indexStoreDB.locate(
+            testCaseName: testCaseName,
+            testIdentifier: testIdentifierString,
+            moduleName: moduleName
+        )
+
+        guard let location else {
+            throw OutputError(message: "Location not found")
+        }
+
+        let result: [String: AnyHashable] = [
+            "testIdentifierString": testIdentifierString,
+            "testCaseName":         testCaseName,
+            "path":                 location.path,
+            "line":                 location.line,
+            "column":               location.utf8Column,
+            "module":               location.moduleName,
+        ]
 
         let options: JSONSerialization.WritingOptions = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
         let data = try JSONSerialization.data(withJSONObject: result, options: options)

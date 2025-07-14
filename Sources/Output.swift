@@ -16,7 +16,7 @@ extension Output {
     /// Returns the json representation of the report
     func jsonFormatted() throws -> String {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted]
+        encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
         let data = try encoder.encode(self)
         return String(decoding: data, as: UTF8.self)
     }
