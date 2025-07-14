@@ -30,12 +30,10 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 
 #### Locate tests using `IndexStoreDB`
 ```shell
- swift run xcresultowners locate-tests \
+ swift run xcresultowners locate-test \
    --library-path  $(xcodebuild -find-library libIndexStore.dylib) \
    --store-path    <path-to-derived-data-directory-of-target> + "/Index.noindex/DataStore" \
-   <test-identifier-from-xcresults-file> \
-   <test-identifier-from-xcresults-file>
-   ...
+   <module-name> <test-identifier-from-xcresults-file>
 ```
 
 #### Comprehensive USAGE details
@@ -51,8 +49,8 @@ swift run xcresultowners help
    xcrun xcresulttool get test-results summary --path <path-to-xcresult-bundle> 
    ```
    
-   The output includes a `testIdentifierString` and `testIdentifierURL` for each failing test case that encodes all types that a test case is nested within including the module name. 
-1. Since the `testIdentifierString` is not a location of a file, this needs to be mapped to a file path. Under the hood, Xcode uses the open-sourced [indexstore-db](https://github.com/swiftlang/indexstore-db) project (available as a swift package) for features such as symbol lookups and code completion. This library can be leveraged to search for symbol occurrences, then use their symbol [`USRs`](https://github.com/swiftlang/swift/blob/main/docs/Lexicon.md#usr) to find the occurrence that precisely matches a `testIdentifierString` or a `testIdentifierURL`. `indexstore-db` provides rich information about the occurrence that includes its role, kind, file path, line number etc. 
+   The output includes a `testIdentifierString` and `targetName` for each failing test case. 
+1. Since the `testIdentifierString` is not a location of a file, this needs to be mapped to a file path. Under the hood, Xcode uses the open-sourced [indexstore-db](https://github.com/swiftlang/indexstore-db) project (available as a swift package) for features such as symbol lookups and code completion. This library can be leveraged to locate the test case represented by `testIdentifierString`. 
 1. Once the location where the test case is defined is determined, we can use information (patterns and associated team mentions) in the GitHub `CODEOWNERS` file generate a list of owners for every file in a repository and determine a definitive list of owners of the test case in question. For pattern matching (globbing), we use POSIX standard's [`fnmatch`](https://pubs.opengroup.org/onlinepubs/9699919799/functions/fnmatch.html) that is natively available in `Swift`.
 
 ## Road to v1.0
