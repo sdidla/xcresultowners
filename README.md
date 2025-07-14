@@ -1,3 +1,5 @@
+![Unit Tests](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml/badge.svg)
+
 # xcresultowners
 
 This project supplements the test results summary produced by [`xcresulttool`](https://keith.github.io/xcode-man-pages/xcresulttool.1.html) with code ownership defined in GitHub's [`CODEOWNERS`](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) file.
