@@ -12,11 +12,19 @@ public extension IndexStoreDB {
             ignoreCase: false
         )
 
-        let occurrence = occurrences.first {
-            $0.location.moduleName == moduleName && symbolIdentifier($0) == testIdentifier
+        let moduleDefinitions = occurrences.filter {
+            $0.roles.contains(.definition) &&
+            $0.location.moduleName == moduleName
         }
 
-        return occurrence?.location
+        // if there are more than 1 matches, use testIdentifier to find a match.
+        let definition = if moduleDefinitions.count > 1 {
+            moduleDefinitions.first { symbolIdentifier($0) == testIdentifier }
+        } else {
+            moduleDefinitions.first
+        }
+
+        return definition?.location
     }
 }
 
