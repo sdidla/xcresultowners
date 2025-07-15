@@ -3,7 +3,11 @@ import IndexStoreDB
 
 public extension IndexStoreDB {
     /// Returns the location of the test case
-    func locate(testCaseName: String, testIdentifier: String, moduleName: String) -> SymbolLocation? {
+    func locate(testIdentifier: String, moduleName: String) -> SymbolLocation? {
+        guard let testCaseName = URL(string: testIdentifier)?.lastPathComponent else {
+            return nil
+        }
+
         let occurrences = canonicalOccurrences(
             containing: testCaseName,
             anchorStart: true,
@@ -14,7 +18,9 @@ public extension IndexStoreDB {
 
         let moduleDefinitions = occurrences.filter {
             $0.roles.contains(.definition) &&
-            $0.location.moduleName == moduleName
+            $0.location.moduleName == moduleName &&
+            $0.symbol.kind == .function ||
+            $0.symbol.kind == .instanceMethod
         }
 
         // if there are more than 1 matches, use testIdentifier to find a match.

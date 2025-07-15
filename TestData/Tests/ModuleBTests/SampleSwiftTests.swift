@@ -17,3 +17,22 @@ struct SampleSwiftTests {
         @Test func testBar() async throws {}
     }
 }
+
+struct DeeplyNestedTests {
+    struct Level1 {
+        struct Level2 {
+            struct Level3 {
+                struct Level4 {
+                    struct Level5 {
+                        struct Level6 {
+                            struct Level7 {
+                                @Test func foo() async throws {}
+                                @Test func bar() async throws {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

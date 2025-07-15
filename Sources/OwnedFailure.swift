@@ -13,7 +13,6 @@ func resolveFailureOwners(
 ) -> [OwnedFailure] {
     testFailures.compactMap { failure in
         let location = indexStoreDB.locate(
-            testCaseName: failure.testName,
             testIdentifier: failure.testIdentifierString,
             moduleName: failure.targetName
         )

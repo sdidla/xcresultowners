@@ -88,7 +88,6 @@ struct LocateTest: AsyncParsableCommand {
         }
 
         let location = indexStoreDB.locate(
-            testCaseName: testCaseName,
             testIdentifier: testIdentifierString,
             moduleName: moduleName
         )

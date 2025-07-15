@@ -6,52 +6,74 @@ import xcresultowners
 @Suite(.indexStoreDB)
 struct LocateTests {
 
-    @Test func locateTopLevelSwiftTest() async throws {
+    // MARK: - XCTests
+
+    @Test func locateXCTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testCaseName: "topLevelTest()",
-            testIdentifier: "topLevelTest()",
-            moduleName: "ModuleATests"
+            testIdentifier: "SampleXCTests/testFoo()",
+            moduleName: "ModuleBTests"
         )
 
-        #expect(location?.moduleName == "ModuleATests")
-        #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
+        #expect(location?.moduleName == "ModuleBTests")
+        #expect(location?.path.hasSuffix("TestData/Tests/ModuleBTests/SampleXCTests.swift") == true)
+        #expect(location?.line == 4)
+    }
+
+    @Test func locateNestedXCTest() async throws {
+        let location = IndexStoreDB.suiteShared?.locate(
+            testIdentifier: "SampleXCTests/SampleNestedXCTests/testFoo()",
+            moduleName: "ModuleBTests"
+        )
+
+        #expect(location?.moduleName == "ModuleBTests")
+        #expect(location?.path.hasSuffix("TestData/Tests/ModuleBTests/SampleXCTests.swift") == true)
+        #expect(location?.line == 8)
+    }
+
+    // MARK: - Swift Testing
+
+    @Test func locateTopLevelSwiftTest() async throws {
+        let location = IndexStoreDB.suiteShared?.locate(
+            testIdentifier: "topLevelTest()",
+            moduleName: "ModuleBTests"
+        )
+
+        #expect(location?.moduleName == "ModuleBTests")
+        #expect(location?.path.hasSuffix("TestData/Tests/ModuleBTests/SampleSwiftTests.swift") == true)
         #expect(location?.line == 4)
     }
 
     @Test func locateSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testCaseName: "foo()",
             testIdentifier: "SampleSwiftTests/foo()",
-            moduleName: "ModuleATests"
+            moduleName: "ModuleBTests"
         )
 
-        #expect(location?.moduleName == "ModuleATests")
-        #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
+        #expect(location?.moduleName == "ModuleBTests")
+        #expect(location?.path.hasSuffix("TestData/Tests/ModuleBTests/SampleSwiftTests.swift") == true)
         #expect(location?.line == 7)
     }
 
     @Test func locateNestedSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testCaseName: "foo()",
             testIdentifier: "SampleSwiftTests/NestedSwiftTests/foo()",
-            moduleName: "ModuleATests"
+            moduleName: "ModuleBTests"
         )
 
-        #expect(location?.moduleName == "ModuleATests")
-        #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
+        #expect(location?.moduleName == "ModuleBTests")
+        #expect(location?.path.hasSuffix("TestData/Tests/ModuleBTests/SampleSwiftTests.swift") == true)
         #expect(location?.line == 14)
     }
 
-    @Test func locateSwiftTestWithTestPrefix() async throws {
+    @Test func locateDeeplyNestedSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testCaseName: "testFoo()",
-            testIdentifier: "SampleSwiftTests/testFoo()",
-            moduleName: "ModuleATests"
+            testIdentifier: "DeeplyNestedTests/Level1/Level2/Level3/Level4/Level5/Level6/Level7/foo()",
+            moduleName: "ModuleBTests"
         )
 
-        #expect(location?.moduleName == "ModuleATests")
-        #expect(location?.path.hasSuffix("TestData/Tests/ModuleATests/SampleSwiftTests.swift") == true)
-        #expect(location?.line == 9)
+        #expect(location?.moduleName == "ModuleBTests")
+        #expect(location?.path.hasSuffix("TestData/Tests/ModuleBTests/SampleSwiftTests.swift") == true)
+        #expect(location?.line == 29)
     }
 }
 
