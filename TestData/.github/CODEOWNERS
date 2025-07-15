@@ -1,0 +1,64 @@
+# See https://help.github.com/articles/about-codeowners/
+# for more info about CODEOWNERS file
+
+# Package files
+Package.swift                                                  @package-file-owner
+
+# Match all files in Module A without wildcards
+Sources/ModuleA                                                @module-a-default-owner
+
+# Override owner for a pattern within Module A
+Sources/ModuleA/**/*File3.swift                                @module-a-file-3-owner
+
+# Override owner for a file within Module A
+Sources/ModuleA/Folder2/Folder2-File3.swift                    @module-a-folder-2-file-3-owner
+
+# Match all files in Module B using "*"
+Sources/ModuleB/*                                              @module-b-default-owner
+
+# Match all files in Tests using "/**"
+# and assign multiple owners
+Tests/**                                                       @module-a-default-owner   @module-b-default-owner
+
+
+# Directory Tree
+#
+#  .
+#  ├── BREWFILE
+#  ├── Makefile
+#  ├── Package.swift
+#  ├── Sources
+#  │   ├── ModuleA
+#  │   │   ├── Folder1
+#  │   │   │   ├── Folder1-File1.swift
+#  │   │   │   ├── Folder1-File2.swift
+#  │   │   │   ├── Folder1-File3.swift
+#  │   │   │   ├── SubfolderA
+#  │   │   │   │   ├── SubfolderA.File1.swift
+#  │   │   │   │   ├── SubfolderA.File2.swift
+#  │   │   │   │   └── SubfolderA.File3.swift
+#  │   │   │   └── SubfolderB
+#  │   │   │       ├── SubfolderB.File1.swift
+#  │   │   │       ├── SubfolderB.File2.swift
+#  │   │   │       └── SubfolderB.File3.swift
+#  │   │   ├── Folder2
+#  │   │   │   ├── Folder2-File1.swift
+#  │   │   │   ├── Folder2-File2.swift
+#  │   │   │   └── Folder2-File3.swift
+#  │   │   ├── ModuleA-File1.swift
+#  │   │   ├── ModuleA-File2.swift
+#  │   │   └── ModuleA-File3.swift
+#  │   └── ModuleB
+#  │       ├── ModuleB-File1.swift
+#  │       ├── ModuleB-File2.swift
+#  │       └── ModuleB-File3.swift
+#  └── Tests
+#      ├── ModuleATests
+#      │   ├── SampleSwiftTests.swift
+#      │   └── SampleXCTests.swift
+#      └── ModuleBTests
+#          ├── SampleSwiftTests.swift
+#          └── SampleXCTests.swift
+#
+#  11 directories, 25 files
+#

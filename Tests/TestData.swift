@@ -7,18 +7,18 @@ class TestData {
     }
 
     static func testProjectIndexStorePath() throws -> String {
+        let testProjectPath = testProjectURL.path()
         let buildPath = try shell("swift build --package-path \(testProjectPath) --show-bin-path")
         _ = try shell("rm -rf \(buildPath)")
         _ = try shell("swift build --package-path \(testProjectPath) --build-tests")
         return buildPath + "/index/store"
     }
 
-    private static var testProjectPath: String {
+    static var testProjectURL: URL {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appending(path: "TestData")
-            .path()
     }
 
     private static func shell(_ command: String) throws -> String {
