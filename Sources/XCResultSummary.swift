@@ -13,7 +13,7 @@ struct XCResultSummary: Codable {
     let passedTests: Int
     let skippedTests: Int
     let totalTestCount: Int
-    let result: String
+    let result: TestResult
 
     let testFailures: [TestFailure]
 
@@ -23,5 +23,13 @@ struct XCResultSummary: Codable {
         let testIdentifierString: String
         let testIdentifierURL: URL?
         let testName: String
+    }
+
+    enum TestResult: String, Codable {
+        case passed = "Passed"
+        case failed = "Failed"
+        case skipped = "Skipped"
+        case expectedFailure = "Expected Failure"
+        case unknown = "unknown"
     }
 }

@@ -4,6 +4,8 @@ import IndexStoreDB
 struct OwnedFailure: Codable {
     let xcFailure: XCResultSummary.TestFailure
     let owners: [String]
+    let path: String?
+    let line: Int?
 }
 
 func resolveFailureOwners(
@@ -19,7 +21,12 @@ func resolveFailureOwners(
 
         guard let location else {
             logToStandardError("Unable to locate test: \(failure.testName)")
-            return OwnedFailure(xcFailure: failure, owners: [])
+            return OwnedFailure(
+                xcFailure: failure,
+                owners: [],
+                path: nil,
+                line: nil
+            )
         }
 
         let fileURL = URL(fileURLWithPath: location.path)
@@ -27,9 +34,19 @@ func resolveFailureOwners(
 
         guard let owners = ownedFile?.owners else {
             logToStandardError("Unable to locate owners: \(location.path)")
-            return OwnedFailure(xcFailure: failure, owners: [])
+            return OwnedFailure(
+                xcFailure: failure,
+                owners: [],
+                path: location.path,
+                line: location.line
+            )
         }
 
-        return OwnedFailure(xcFailure: failure, owners: owners)
+        return OwnedFailure(
+            xcFailure: failure,
+            owners: owners,
+            path: location.path,
+            line: location.line
+        )
     }
 }

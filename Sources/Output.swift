@@ -25,17 +25,34 @@ extension Output {
 extension Output {
     /// Returns markdown represention of the report
     func markdownFormatted() -> String {
+
+        let title = switch xcSummary.result {
+        case .passed:
+            "# ✅ Tests Passed"
+        case .failed:
+            "# 🚨 Tests Failed"
+        case .skipped:
+            "# ⏩ Tests Skipped"
+        case .expectedFailure:
+            "# 🤷 Expected Failures"
+        case .unknown:
+            "# ⚠️ Unknown"
+        }
+
+        let sortedFailures = failures.sorted {
+            $0.owners.sorted().joined() < $1.owners.sorted().joined()
+        }
+
         var markdown = """
-        # Testing Completed
         
-        | Summary               |    | 
-        | --------------------- | -- |
-        | **Result**            | \(xcSummary.result == "Failed" ? "❌" : xcSummary.result) |
-        | **Failed**            | \(xcSummary.failedTests) |
-        | **Passed**            | \(xcSummary.passedTests) |
-        | **Skipped**           | \(xcSummary.skippedTests) |
-        | **Expected Failures** | \(xcSummary.expectedFailures) |
-        | **Total Tests**       | \(xcSummary.totalTestCount) |
+        \(title)
+        
+        | Total Tests           | \(xcSummary.totalTestCount)   |
+        | :-------------------- | :---------------------------- |
+        | 🚨 Failed             | \(xcSummary.failedTests)      |
+        | ⏩ Skipped            | \(xcSummary.skippedTests)     |
+        | 🤷 Expected Failures  | \(xcSummary.expectedFailures) |
+        | ✅ Passed             | \(xcSummary.passedTests)      |
         
         
         """
@@ -47,16 +64,29 @@ extension Output {
             
             """
 
-            for failure in failures {
+            for failure in sortedFailures {
+
+                let testName = failure.xcFailure.testName
+                let owners = failure.owners.formatted(.list(type: .and))
+
                 markdown += """
-                1. `\(failure.xcFailure.testName)`
                 
-                    **Reason:** \(failure.xcFailure.failureText)
-                    **Identifier:** `\(failure.xcFailure.testIdentifierString)`
-                    **Module:** `\(failure.xcFailure.targetName)`
-                    **Owner:** \(failure.owners.formatted(.list(type: .and)))
+                <details>
+                  <summary>\(owners) → <b><code>\(testName)</code></b></summary>
                 
+                  #### Location
+                  | \(failure.xcFailure.targetName) | \(failure.xcFailure.testIdentifierString) |
+                  | :------------------------------ | :---------------------------------------- |
+                  | File                            | \(failure.path ?? "not-found")            |
+                  | Line                            | \(failure.line?.formatted() ?? "n/a")     |
                 
+                  #### Reason
+                  ```
+                  \(failure.xcFailure.failureText)
+                  ```
+                
+                </details>
+
                 """
             }
         }
