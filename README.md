@@ -60,5 +60,5 @@ swift run xcresultowners help
 
 - [x] Implement a sub-command or separate executable for locating a test with a given test-identifier
 - [x] Implement a sub-command or separate executable for listing owners of a file
-- [x] Improve documentation
-- [ ] Add unit tests
+- [x] Add unit tests
+- [ ] Improve documentation
