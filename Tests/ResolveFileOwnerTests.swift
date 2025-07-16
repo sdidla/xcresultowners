@@ -1,5 +1,5 @@
 import Testing
-import xcresultowners
+import XCResultOwnersCore
 
 @Test(arguments: Expected.all)
 func resolveFileOwners(expected: Expected) async throws {

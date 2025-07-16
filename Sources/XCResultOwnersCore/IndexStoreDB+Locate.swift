@@ -2,7 +2,7 @@ import Foundation
 import IndexStoreDB
 
 public extension IndexStoreDB {
-    /// Returns the location of the test case
+    /// Returns the location of a test case identified by `testIdentifier`
     func locate(testIdentifier: String, moduleName: String) -> SymbolLocation? {
         guard let testCaseName = URL(string: testIdentifier)?.lastPathComponent else {
             return nil
@@ -35,17 +35,17 @@ public extension IndexStoreDB {
 }
 
 extension IndexStoreDB {
-    /// A unique identifier for a symbol that corresponds to a `testIdentifierString` from a `xcresult` bundle
-    func symbolIdentifier(_ occurrence: SymbolOccurrence) -> String {
-        let parentUSR = occurrence.relations
+    /// A unique identifier for a symbol that corresponds to the `testIdentifierString` from an `xcresult` bundle
+    func symbolIdentifier(_ canonicalOccurrence: SymbolOccurrence) -> String {
+        let parentUSR = canonicalOccurrence.relations
             .filter { $0.roles.contains(.childOf) }
             .map { $0.symbol.usr }
             .first
 
         if let parentUSR, let parentDefinition = occurrences(ofUSR: parentUSR, roles: .definition).first {
-            return symbolIdentifier(parentDefinition) + "/" + occurrence.symbol.name
+            return symbolIdentifier(parentDefinition) + "/" + canonicalOccurrence.symbol.name
         } else {
-            return occurrence.symbol.name
+            return canonicalOccurrence.symbol.name
         }
     }
 }

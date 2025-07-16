@@ -1,21 +1,22 @@
 import Foundation
 import ArgumentParser
 import IndexStoreDB
+import XCResultOwnersCore
 
 @main struct XCResultOwners: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName:"xcresultowners",
         abstract: "A utility that locates test cases and their owners",
         subcommands: [
-            GenerateReport.self,
+            Summarize.self,
             LocateTest.self,
             FileOwners.self
         ],
-        defaultSubcommand: GenerateReport.self
+        defaultSubcommand: Summarize.self
     )
 }
 
-struct GenerateReport: AsyncParsableCommand {
+struct Summarize: AsyncParsableCommand {
     enum OutputFormat: String, ExpressibleByArgument {
         case json
         case markdown
@@ -40,10 +41,12 @@ struct GenerateReport: AsyncParsableCommand {
         let repositoryURL = URL(fileURLWithPath: repositoryPath)
         let xcResultJSONURL = URL(fileURLWithPath: xcResultJSONPath)
 
+        logToStandardError("Initializing database and resolving codeowners...")
         async let _ownedFiles = resolveFileOwners(repositoryURL: repositoryURL)
         async let _indexStoreDB = IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
 
         let (ownedFiles, indexStoreDB) = try await (_ownedFiles, _indexStoreDB)
+        logToStandardError("Initializing database and resolving codeowners... ✓")
 
         let fileData = try Data(contentsOf: xcResultJSONURL)
         let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: fileData)
@@ -54,15 +57,23 @@ struct GenerateReport: AsyncParsableCommand {
             indexStoreDB: indexStoreDB
         )
 
-        let output = Output(
+        let summary = Summary(
             xcSummary: xcResultSummary,
             failures: ownedFailures
         )
 
+        for failure in summary.unresolvedFailures {
+            if failure.path == nil {
+                logToStandardError("‼️  Unable to locate \(failure.xcFailure.testIdentifierString)")
+            } else if let path = failure.path, failure.owners == nil {
+                logToStandardError("‼️  Unable to find owner for \(path)")
+            }
+        }
+
         if format == .json {
-            try print(output.jsonFormatted())
+            try print(summary.jsonFormatted())
         } else {
-            print(output.markdownFormatted())
+            print(summary.markdownFormatted())
         }
     }
 }
@@ -126,7 +137,7 @@ struct FileOwners: AsyncParsableCommand {
         let result = filePaths.map { filePath in
             let fileURL = URL(fileURLWithPath: filePath)
             let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
-            return ownedFile ?? OwnedFile(fileURL: fileURL, owners: [])
+            return ownedFile ?? OwnedFile(fileURL: fileURL, owners: nil)
         }
 
         let encorder = JSONEncoder()
@@ -135,4 +146,14 @@ struct FileOwners: AsyncParsableCommand {
         let json = String(decoding: data, as: UTF8.self)
         print(json)
     }
+}
+
+struct OutputError: Error {
+    let message: String
+}
+
+func logToStandardError(_ message: String) {
+    let datedMessage = Date().formatted(.iso8601) + " " + message + "\n"
+    let datedMessageData = Data(datedMessage.utf8)
+    try? FileHandle.standardError.write(contentsOf: datedMessageData)
 }

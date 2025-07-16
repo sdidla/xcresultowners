@@ -1,5 +1,5 @@
 import Testing
-import xcresultowners
+import XCResultOwnersCore
 @preconcurrency import IndexStoreDB
 
 @Suite(.indexStoreDB)
