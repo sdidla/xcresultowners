@@ -37,7 +37,7 @@ jobs:
             --hosting-base-path "xcresultowners" \
             --output-path "docs"
       - name: Upload pages
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v4
         with:
           path: 'docs'
       - name: Deploy to GitHub Pages
