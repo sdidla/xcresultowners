@@ -34,3 +34,11 @@ let package = Package(
         )
     ]
 )
+
+import Foundation
+
+if ProcessInfo.processInfo.environment["CI"] == "true" {
+    package.dependencies += [
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.4.5"),
+    ]
+}
