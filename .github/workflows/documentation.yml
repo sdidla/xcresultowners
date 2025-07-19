@@ -27,19 +27,18 @@ jobs:
         uses: actions/configure-pages@v4
       - name: Build documentation
         run: |
-          mkdir docs
+          mkdir _site
           swift package \
-            --allow-writing-to-directory "docs" \
+            --allow-writing-to-directory _site \
             generate-documentation \
             --target XCResultOwners \
             --disable-indexing \
             --transform-for-static-hosting \
             --hosting-base-path "xcresultowners" \
-            --output-path "docs"
+            --output-path _site
+      
       - name: Upload pages
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: 'docs'
-      - name: Deploy to GitHub Pages
+        uses: actions/upload-pages-artifact@v3.0.1
+      - name: Deploy pages
         id: deployment
         uses: actions/deploy-pages@v2
