@@ -12,19 +12,26 @@ permissions:
 
 jobs:
   document:
+    
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: macos-latest
+    
     steps:
+    
       - name: Set up swift
         uses: swift-actions/setup-swift@v2
         with: 
           swift-version: "6.1.0"
+          
       - name: Checkout repository
         uses: actions/checkout@v4
+        
       - name: Setup pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
+        
       - name: Build documentation
         run: |
           mkdir _site
@@ -39,6 +46,7 @@ jobs:
       
       - name: Upload pages
         uses: actions/upload-pages-artifact@v3
+        
       - name: Deploy pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
