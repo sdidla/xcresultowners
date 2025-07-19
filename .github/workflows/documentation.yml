@@ -31,14 +31,14 @@ jobs:
           swift package \
             --allow-writing-to-directory _site \
             generate-documentation \
-            --target XCResultOwners \
+            --target XCResultOwnersCore \
             --disable-indexing \
             --transform-for-static-hosting \
             --hosting-base-path "xcresultowners" \
             --output-path _site
       
       - name: Upload pages
-        uses: actions/upload-pages-artifact@v3.0.1
+        uses: actions/upload-pages-artifact@v3
       - name: Deploy pages
         id: deployment
         uses: actions/deploy-pages@v2
