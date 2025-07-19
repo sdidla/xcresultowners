@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   test:
@@ -12,11 +13,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    
     - name: Set up swift
       uses: swift-actions/setup-swift@v2
       with:
         swift-version: "6.1.0"
+        
     - name: Checkout repository
       uses: actions/checkout@v4
+      
     - name: Run tests
       run: swift test
