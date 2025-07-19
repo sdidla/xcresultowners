@@ -85,18 +85,14 @@ struct LocateTest: AsyncParsableCommand {
     @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of the project")
     var storePath: String
 
-    @Argument(help: "The module where the test name defined")
+    @Option(name: .shortAndLong, help: "The module where the test name defined")
     var moduleName: String
 
-    @Argument(help: "The `testIdentifierString` from an xcresults file")
+    @Option(name: .shortAndLong, help: "The `testIdentifierString` from an xcresults file")
     var testIdentifierString: String
 
     mutating func run() async throws {
         let indexStoreDB = try await IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
-
-        guard let testCaseName = URL(string: testIdentifierString)?.lastPathComponent else {
-            throw OutputError(message: "Invalid testIdentifierString")
-        }
 
         let location = indexStoreDB.locate(
             testIdentifier: testIdentifierString,
@@ -109,7 +105,6 @@ struct LocateTest: AsyncParsableCommand {
 
         let result: [String: AnyHashable] = [
             "testIdentifierString": testIdentifierString,
-            "testCaseName":         testCaseName,
             "path":                 location.path,
             "line":                 location.line,
             "column":               location.utf8Column,
