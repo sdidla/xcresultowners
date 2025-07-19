@@ -1,5 +1,6 @@
+[![Unit Tests](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml)
+[![Documentation](https://github.com/sdidla/xcresultowners/actions/workflows/documentation.yml/badge.svg)](https://sdidla.github.io/xcresultowners/documentation/xcresultownerscore)
 [![GitHub license](https://img.shields.io/github/license/sdidla/xcresultowners)](https://github.com/sdidla/xcresultowners/blob/main/LICENSE)
-![Unit Tests](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml/badge.svg)
 
 # xcresultowners
 
@@ -8,7 +9,7 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 - `xcresultowners`: The command line tool to identify owners of failed tests.
 - `XCResultOwnersCore`: The library that can be used to build your own macOS tool.
 
-## Usage
+## CLI Usage
 
 Both Xcode and Swift Package Manager, by default, create an index store before or while building your project. You will need the path to this store.
 
@@ -53,6 +54,10 @@ Both Xcode and Swift Package Manager, by default, create an index store before o
 swift run xcresultowners help
 ```
 
+## Library Documentation
+
+https://sdidla.github.io/xcresultowners/documentation/xcresultownerscore/
+
 ## Implementation Details
 
 1. In Xcode 16.3, Apple [updated](https://developer.apple.com/documentation/xcode-release-notes/xcode-16_3-release-notes#xcresulttool) `xcresulttool` to use a much improved JSON schema. The human-readable JSON summary can be printed using:
@@ -70,4 +75,4 @@ swift run xcresultowners help
 - [x] Implement a sub-command or separate executable for locating a test with a given test-identifier
 - [x] Implement a sub-command or separate executable for listing owners of a file
 - [x] Add unit tests
-- [ ] Improve documentation
+- [x] Improve documentation
