@@ -125,11 +125,11 @@ print(location.utf8Column)
 
 ## Versioning
 
-This package depends on [`indexstore-db`](https://github.com/swiftlang/indexstore-db) which does not use strict [semantic versioning](https://semver.org). As a result, the SPM package for this project cannot a provide a `semver` compatible package. Please use the `revision:` parameter to use a `tag` in your `Package.swift` file directly:
+This package depends on [`indexstore-db`](https://github.com/swiftlang/indexstore-db) which does not use strict [semantic versioning](https://semver.org). As a result, the SPM package for this project cannot provide a `semver` compatible package. Please use the `revision:` parameter to use a `tag` in your `Package.swift` file directly:
 
 ```swift
 dependencies: [
- .package(url: "https://github.com/sdidla/xcresultowners", revision: "<##>release-tag"),
+   .package(url: "https://github.com/sdidla/xcresultowners", revision: "<#release-tag#>")
 ],
 ```
    
