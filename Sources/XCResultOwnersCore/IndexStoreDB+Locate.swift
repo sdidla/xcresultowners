@@ -3,8 +3,8 @@ import IndexStoreDB
 
 public extension IndexStoreDB {
     /// Returns the location of a test case identified by `testIdentifier`
-    func locate(testIdentifier: String, moduleName: String) -> SymbolLocation? {
-        guard let testCaseName = URL(string: testIdentifier)?.lastPathComponent else {
+    func locate(testIdentifierString: String, moduleName: String) -> SymbolLocation? {
+        guard let testCaseName = URL(string: testIdentifierString)?.lastPathComponent else {
             return nil
         }
 
@@ -25,7 +25,7 @@ public extension IndexStoreDB {
 
         // if there are more than 1 matches, use testIdentifier to find a match.
         let definition = if moduleDefinitions.count > 1 {
-            moduleDefinitions.first { symbolIdentifier($0) == testIdentifier }
+            moduleDefinitions.first { symbolIdentifier($0) == testIdentifierString }
         } else {
             moduleDefinitions.first
         }

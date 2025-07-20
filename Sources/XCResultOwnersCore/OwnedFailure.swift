@@ -33,12 +33,11 @@ public struct OwnedFailure: Codable {
 public func resolveFailureOwners(
     testFailures: [XCResultSummary.TestFailure],
     ownedFiles: [OwnedFile],
-    strict: Bool = false,
     indexStoreDB: IndexStoreDB
 ) -> [OwnedFailure] {
     testFailures.map { failure in
         let location = indexStoreDB.locate(
-            testIdentifier: failure.testIdentifierString,
+            testIdentifierString: failure.testIdentifierString,
             moduleName: failure.targetName
         )
 

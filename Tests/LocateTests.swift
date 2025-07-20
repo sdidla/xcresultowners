@@ -9,7 +9,7 @@ struct LocateTests {
 
     @Test func locateXCTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testIdentifier: "SampleXCTests/testFoo()",
+            testIdentifierString: "SampleXCTests/testFoo()",
             moduleName: "ModuleBTests"
         )
 
@@ -20,7 +20,7 @@ struct LocateTests {
 
     @Test func locateNestedXCTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testIdentifier: "SampleXCTests/SampleNestedXCTests/testFoo()",
+            testIdentifierString: "SampleXCTests/SampleNestedXCTests/testFoo()",
             moduleName: "ModuleBTests"
         )
 
@@ -33,7 +33,7 @@ struct LocateTests {
 
     @Test func locateTopLevelSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testIdentifier: "topLevelTest()",
+            testIdentifierString: "topLevelTest()",
             moduleName: "ModuleBTests"
         )
 
@@ -44,7 +44,7 @@ struct LocateTests {
 
     @Test func locateSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testIdentifier: "SampleSwiftTests/foo()",
+            testIdentifierString: "SampleSwiftTests/foo()",
             moduleName: "ModuleBTests"
         )
 
@@ -55,7 +55,7 @@ struct LocateTests {
 
     @Test func locateNestedSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testIdentifier: "SampleSwiftTests/NestedSwiftTests/foo()",
+            testIdentifierString: "SampleSwiftTests/NestedSwiftTests/foo()",
             moduleName: "ModuleBTests"
         )
 
@@ -66,7 +66,7 @@ struct LocateTests {
 
     @Test func locateDeeplyNestedSwiftTest() async throws {
         let location = IndexStoreDB.suiteShared?.locate(
-            testIdentifier: "DeeplyNestedTests/Level1/Level2/Level3/Level4/Level5/Level6/Level7/foo()",
+            testIdentifierString: "DeeplyNestedTests/Level1/Level2/Level3/Level4/Level5/Level6/Level7/foo()",
             moduleName: "ModuleBTests"
         )
 

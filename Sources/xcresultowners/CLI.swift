@@ -95,7 +95,7 @@ struct LocateTest: AsyncParsableCommand {
         let indexStoreDB = try await IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
 
         let location = indexStoreDB.locate(
-            testIdentifier: testIdentifierString,
+            testIdentifierString: testIdentifierString,
             moduleName: moduleName
         )
 
