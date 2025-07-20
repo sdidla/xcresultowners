@@ -9,12 +9,21 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 - `xcresultowners`: The command line tool to identify owners of failed tests.
 - `XCResultOwnersCore`: The library that can be used to build your own macOS tool.
 
-## CLI Usage
+## Usage
 
-Both Xcode and Swift Package Manager, by default, create an index store before or while building your project. You will need the path to this store.
+You will need the path to `libIndexStore.dylib` that is installed with Xcode. This can be located using:
+
+```shell
+xcrun xcodebuild -find-library libIndexStore.dylib
+```
+
+You will also need to locate the index store of your project. Both Xcode and Swift Package Manager, by default, create an index store before or while building your project.
 
 - For Xcode projects, by default it is located at `$HOME/Library/Developer/Xcode/DerivedData/<projectname>-<hash>/Index.noindex/DataStore`
 - For SPM projects, by default it is located at `./build/debug/index/store`
+
+
+### Command Line Tool - `xcresultowners`
 
 #### Supplement xcresult summary with owners
 ```shell
@@ -31,7 +40,7 @@ Both Xcode and Swift Package Manager, by default, create an index store before o
 
 ```
 
-#### Find owners of files using `CODEOWNERS`
+#### List owners of files
 ```shell
  swift run xcresultowners file-owners \
    --repository-path <path-to-repository> \
@@ -54,9 +63,51 @@ Both Xcode and Swift Package Manager, by default, create an index store before o
 swift run xcresultowners help
 ```
 
-## Library Documentation
+### Library - `XCResultOwnersCore`
 
-https://sdidla.github.io/xcresultowners/documentation/xcresultownerscore/
+#### Identifying owners of a file
+
+
+```swift
+import XCResultOwnersCore
+
+let repositoryURL = URL(fileURLWithPath: repositoryPath)
+let ownedFiles = try await resolveFileOwners(repositoryURL: repositoryURL)
+
+for file in ownedFiles {
+    print(file.fileURL)
+    print(file.owners)
+}
+```
+
+#### Locating Tests
+
+```swift
+import XCResultOwnersCore
+
+let indexStoreDB = try await IndexStoreDB(
+    storePath: storePath, 
+    libraryPath: libraryPath
+)
+
+let location = indexStoreDB.locate(
+    testIdentifierString: testIdentifierString,
+    moduleName: moduleName
+)
+
+print(location.moduleName)
+print(location.path)
+print(location.line)
+print(location.utf8Column)
+
+```
+
+#### API Documentation
+
+[Documentation](https://sdidla.github.io/xcresultowners/documentation/xcresultownerscore/)
+
+
+
 
 ## Implementation Details
 
@@ -70,9 +121,21 @@ https://sdidla.github.io/xcresultowners/documentation/xcresultownerscore/
 1. Since the `testIdentifierString` is not a location of a file, this needs to be mapped to a file path. Under the hood, Xcode uses the open-sourced [indexstore-db](https://github.com/swiftlang/indexstore-db) project (available as a swift package) for features such as symbol lookups and code completion. This library can be leveraged to locate the test case represented by `testIdentifierString`. 
 1. Once the location where the test case is defined is determined, we can use information (patterns and associated team mentions) in the GitHub `CODEOWNERS` file to generate a list of owners for every file in a repository and determine a definitive list of owners of the test case in question. For pattern matching (globbing), we use POSIX standard's [`fnmatch`](https://pubs.opengroup.org/onlinepubs/9699919799/functions/fnmatch.html) that is natively available in `Swift`.
 
-## Road to v1.0
+## Versioning
 
-- [x] Implement a sub-command or separate executable for locating a test with a given test-identifier
-- [x] Implement a sub-command or separate executable for listing owners of a file
-- [x] Add unit tests
-- [x] Improve documentation
+This package depends on [`indexstore-db`](https://github.com/swiftlang/indexstore-db) which does not use strict [semantic versioning](https://semver.org). As a result, the SPM package for this project cannot a provide a `semver` compatible package. Please use the `revision:` parameter to use a `tag` directly:
+
+```swift
+dependencies: [
+ .package(url: "https://github.com/sdidla/xcresultowners", revision: "<##>release-tag"),
+],
+```
+   
+The release tags used by this package will follow the following scheme:
+
+```
+<major>.<minor>.<patch>-<indexstore-db-tag>
+```
+
+where `<major>.<minor>.<patch>` will follow `semver` rules but the full version string will not.
+ 
