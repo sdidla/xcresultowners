@@ -134,7 +134,7 @@ dependencies: [
 The release tags used by this package will follow the following scheme:
 
 ```
-<major>.<minor>.<patch>-<indexstore-db-tag>
+v<major>.<minor>.<patch>-<indexstore-db-tag>
 ```
 
 where `<major>.<minor>.<patch>` will follow `semver` rules but the full version string will not.
