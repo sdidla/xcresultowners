@@ -1,5 +1,7 @@
 [![Unit Tests](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml)
 [![Documentation](https://github.com/sdidla/xcresultowners/actions/workflows/documentation.yml/badge.svg)](https://sdidla.github.io/xcresultowners/documentation/xcresultownerscore)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsdidla%2Fxcresultowners%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/sdidla/xcresultowners)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsdidla%2Fxcresultowners%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/sdidla/xcresultowners)
 [![GitHub license](https://img.shields.io/github/license/sdidla/xcresultowners)](https://github.com/sdidla/xcresultowners/blob/main/LICENSE)
 
 # xcresultowners
