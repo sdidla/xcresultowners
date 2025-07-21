@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represent a file with owners assigned from the `CODEOWNERS` file
-public struct OwnedFile: Codable {
+public struct OwnedFile: Codable, Sendable {
     /// The location of the file on the filesystem
     public let fileURL: URL
 

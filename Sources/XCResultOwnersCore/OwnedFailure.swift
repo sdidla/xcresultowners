@@ -2,7 +2,7 @@ import Foundation
 import IndexStoreDB
 
 /// Represents an XCFailure with resolved `path`, `line` and `owners`
-public struct OwnedFailure: Codable {
+public struct OwnedFailure: Codable, Sendable {
     /// The original failure as it appears in the `xcresult` bundle
     public let xcFailure: XCResultSummary.TestFailure
 

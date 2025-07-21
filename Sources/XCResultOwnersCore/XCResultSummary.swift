@@ -4,7 +4,7 @@ import Foundation
 /// https://developer.apple.com/documentation/xcode-release-notes/xcode-16_3-release-notes#xcresulttool
 ///
 /// Run `xcrun xcresulttool help get test-results summary` to see the full JSON schema
-public struct XCResultSummary: Codable {
+public struct XCResultSummary: Codable, Sendable {
     public let title: String
     public let environmentDescription: String
     public let expectedFailures: Int
@@ -37,7 +37,7 @@ public struct XCResultSummary: Codable {
         self.testFailures = testFailures
     }
 
-    public struct TestFailure: Codable {
+    public struct TestFailure: Codable, Sendable {
         public let failureText: String
         public let targetName: String
         public let testIdentifierString: String
@@ -59,7 +59,7 @@ public struct XCResultSummary: Codable {
         }
     }
 
-    public enum TestResult: String, Codable {
+    public enum TestResult: String, Codable, Sendable {
         case passed = "Passed"
         case failed = "Failed"
         case skipped = "Skipped"
