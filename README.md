@@ -1,5 +1,7 @@
 [![Unit Tests](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/sdidla/xcresultowners/actions/workflows/unit-tests.yml)
 [![Documentation](https://github.com/sdidla/xcresultowners/actions/workflows/documentation.yml/badge.svg)](https://sdidla.github.io/xcresultowners/documentation/xcresultownerscore)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsdidla%2Fxcresultowners%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/sdidla/xcresultowners)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsdidla%2Fxcresultowners%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/sdidla/xcresultowners)
 [![GitHub license](https://img.shields.io/github/license/sdidla/xcresultowners)](https://github.com/sdidla/xcresultowners/blob/main/LICENSE)
 
 # xcresultowners
@@ -123,18 +125,18 @@ print(location.utf8Column)
 
 ## Versioning
 
-This package depends on [`indexstore-db`](https://github.com/swiftlang/indexstore-db) which does not use strict [semantic versioning](https://semver.org). As a result, the SPM package for this project cannot a provide a `semver` compatible package. Please use the `revision:` parameter to use a `tag` directly:
+This package depends on [`indexstore-db`](https://github.com/swiftlang/indexstore-db) which does not use strict [semantic versioning](https://semver.org). As a result, the SPM package for this project cannot provide a `semver` compatible package. Please use the `revision:` parameter to use a `tag` in your `Package.swift` file directly:
 
 ```swift
 dependencies: [
- .package(url: "https://github.com/sdidla/xcresultowners", revision: "<##>release-tag"),
+   .package(url: "https://github.com/sdidla/xcresultowners", revision: "<#release-tag#>")
 ],
 ```
    
 The release tags used by this package will follow the following scheme:
 
 ```
-<major>.<minor>.<patch>-<indexstore-db-tag>
+v<major>.<minor>.<patch>-<indexstore-db-tag>
 ```
 
 where `<major>.<minor>.<patch>` will follow `semver` rules but the full version string will not.
