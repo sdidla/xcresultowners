@@ -119,21 +119,23 @@ struct LocateTest: AsyncParsableCommand {
 }
 
 struct FileOwners: AsyncParsableCommand {
-    @Option(name: .shortAndLong,help: "Path to the repository that contains github.com CODEOWNERS and source files")
+    @Option(name: .shortAndLong, help: "Path to the repository that contains github.com CODEOWNERS and source files")
     var repositoryPath: String
 
-    @Argument(help: "Paths to files in the repository")
-    var filePaths: [String]
+    @Option(name: .shortAndLong, help: "Optionally specify the paths of files you are interested in")
+    var filePaths: [String] = []
 
     mutating func run() async throws {
         let repositoryURL = URL(fileURLWithPath: repositoryPath)
-        let ownedFiles = try await resolveFileOwners(repositoryURL: repositoryURL)
+        let allOwnedFiles = try await resolveFileOwners(repositoryURL: repositoryURL)
 
-        let result = filePaths.map { filePath in
+        let requestedOwnedFiles = filePaths.map { filePath in
             let fileURL = URL(fileURLWithPath: filePath)
-            let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
+            let ownedFile = allOwnedFiles.first { $0.fileURL == fileURL }
             return ownedFile ?? OwnedFile(fileURL: fileURL, owners: nil)
         }
+
+        let result = filePaths.isEmpty ? allOwnedFiles: requestedOwnedFiles
 
         let encorder = JSONEncoder()
         encorder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
