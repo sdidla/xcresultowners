@@ -25,7 +25,7 @@ You will also need to locate the index store of your project. Both Xcode and Swi
 - For SPM projects, by default it is located at `./build/debug/index/store`
 
 
-### Command Line Tool - `xcresultowners`
+### `xcresultowners`
 
 #### Supplement xcresult summary with owners
 ```shell
@@ -62,7 +62,7 @@ You will also need to locate the index store of your project. Both Xcode and Swi
 swift run xcresultowners help
 ```
 
-### Library - `XCResultOwnersCore`
+### `XCResultOwnersCore`
 
 #### Resolving owners of all failures
 
