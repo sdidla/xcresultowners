@@ -44,11 +44,7 @@ You will also need to locate the index store of your project. Both Xcode and Swi
 
 #### List owners of files
 ```shell
- swift run xcresultowners file-owners \
-   --repository-path <path-to-repository> \
-   <path-to-file> \
-   <path-to-file>
-   ...
+ swift run xcresultowners file-owners --repository-path <path-to-repository>
 ```
 
 #### Locate tests using `IndexStoreDB`
@@ -60,6 +56,7 @@ You will also need to locate the index store of your project. Both Xcode and Swi
    --test-identifier-string  <test-identifier-string-from-xcresults-file>
 ```
 
+
 #### Comprehensive USAGE details
 ```shell
 swift run xcresultowners help
@@ -67,8 +64,23 @@ swift run xcresultowners help
 
 ### Library - `XCResultOwnersCore`
 
-#### Identifying owners of a file
+#### Resolving owners of all failures
 
+```swift
+import XCResultOwnersCore
+
+async let ownedFiles = resolveFileOwners(repositoryURL: repositoryURL)
+async let indexStoreDB = IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
+let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: xcResultSummaryJSON)
+
+let ownedFailures = try await resolveFailureOwners(
+    testFailures: xcResultSummary.testFailures,
+    ownedFiles: ownedFiles,
+    indexStoreDB: indexStoreDB
+)
+```
+
+#### Identifying owners of a file
 
 ```swift
 import XCResultOwnersCore
