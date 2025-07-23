@@ -76,36 +76,27 @@ public extension Summary {
             markdown += """
             ## Failures
             
-            
             """
 
             for failure in failures {
 
-                let testName = failure.xcFailure.testName
-
-                let summary = if let owners = failure.owners?.formatted(.list(type: .and)) {
-                    "<summary>\(owners) → <b><code>\(testName)</code></b></summary>"
-                } else {
-                    "<summary><b><code>\(testName)</code></b></summary>"
-                }
+                let ownersList = failure.owners?.joined(separator: ", ")
+                let owners = ownersList ?? "<not-found>"
+                let path = failure.path ?? "<not-found>"
+                let line = failure.line ?? 0
 
                 markdown += """
                 
-                <details>
-                  \(summary)
+                <pre>
+                Test Case:      <b>\(failure.xcFailure.testName)</b>
+                Identifier:     \(failure.xcFailure.testIdentifierString)
+                Owner:          <b>\(owners)</b>
+                Module:         \(failure.xcFailure.targetName)
+                Location:       \(path)#\(line)
+
+                <b>\(failure.xcFailure.failureText)</b>
                 
-                  #### Location
-                  | \(failure.xcFailure.targetName) | \(failure.xcFailure.testIdentifierString) |
-                  | :------------------------------ | :---------------------------------------- |
-                  | File                            | \(failure.path ?? "not-found")            |
-                  | Line                            | \(failure.line?.formatted() ?? "n/a")     |
-                
-                  #### Reason
-                  ```
-                  \(failure.xcFailure.failureText)
-                  ```
-                
-                </details>
+                </pre>
 
                 """
             }
