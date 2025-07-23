@@ -1,7 +1,8 @@
 import Foundation
 
-/// Xcode 16.3 ships with a new version of xcresulttool that has a clean JSON response
-/// https://developer.apple.com/documentation/xcode-release-notes/xcode-16_3-release-notes#xcresulttool
+/// Represents the original schema produced by `xcresulttool`
+///
+/// [Xcode 16.3](https://developer.apple.com/documentation/xcode-release-notes/xcode-16_3-release-notes#xcresulttool) ships with a new version of xcresulttool that has a clean JSON response
 ///
 /// Run `xcrun xcresulttool help get test-results summary` to see the full JSON schema
 public struct XCResultSummary: Codable, Sendable {
