@@ -15,9 +15,37 @@ public struct OwnedFile: Codable, Sendable {
     }
 }
 
-/// Uses github.com's `CODEOWNERS` to return a list of files and corresponding owners
-public func resolveFileOwners(repositoryURL: URL) async throws -> [OwnedFile] {
-    let codeOwnersURL = repositoryURL.appending(path: "/.github/CODEOWNERS")
+/// The default path to the code owners file. Customizable
+/// Value: `/.github/CODEOWNERS`
+public let defaultCodeOwnersPath = ".github/CODEOWNERS"
+
+/// The default patterns to ignore. Customizable.
+///
+/// Value:
+/// ```
+/// "*/build/*",
+/// "*/Build/*",
+/// "*/.build/*"
+/// ```
+public let defaultIgnorePatterns = [
+    "*/build/*",
+    "*/Build/*",
+    "*/.build/*"
+]
+
+/// Resolves owners of all files in a repository
+/// - Parameters:
+///   - repositoryURL: fileURL to a repository
+///   - codeOwnersRelativePath: path to the CODEOWNERS file relative to the repository
+///   - ignoredPatterns: file patterns that should be ignored. Should use patterns used by `fnmatch(_:_:_:)`
+/// - Throws: Error when the repository or CODEOWNERS cannot be accessed
+/// - Returns: A list of files with their corresponding owners
+public func resolveFileOwners(
+    repositoryURL: URL,
+    codeOwnersRelativePath: String = defaultCodeOwnersPath,
+    ignoredPatterns: [String] = defaultIgnorePatterns,
+) async throws -> [OwnedFile] {
+    let codeOwnersURL = repositoryURL.appending(path: codeOwnersRelativePath)
 
     // Process CODEOWNERS File
     let patterns = try String(contentsOf: codeOwnersURL, encoding: .utf8)
@@ -30,14 +58,11 @@ public func resolveFileOwners(repositoryURL: URL) async throws -> [OwnedFile] {
     return try FileManager.default
         .subpathsOfDirectory(atPath: repositoryURL.path())
         .filter {
-            $0.lowercased().contains("build/") == false &&
-            $0.lowercased().contains(".build/") == false
-        }
-        .filter {
-            $0.lowercased().hasSuffix(".swift") ||
-            $0.lowercased().hasSuffix(".h") ||
-            $0.lowercased().hasSuffix(".m") ||
-            $0.lowercased().hasSuffix(".mm")
+            shouldIgnorePath($0, ignoredPatterns: ignoredPatterns) == false &&
+            $0.hasSuffix(".swift") ||
+            $0.hasSuffix(".h") ||
+            $0.hasSuffix(".m") ||
+            $0.hasSuffix(".mm")
         }
         .map {
             resolveToOwnedFile(
@@ -47,7 +72,15 @@ public func resolveFileOwners(repositoryURL: URL) async throws -> [OwnedFile] {
         }
 }
 
-private func resolveToOwnedFile(fileURL: URL, patterns: [CodeOwnerPattern]) -> OwnedFile {
+/// Use patterns to determine whether to ignore the file path
+func shouldIgnorePath(_ path: String, ignoredPatterns: [String]) -> Bool {
+    ignoredPatterns.contains {
+        fnmatch($0, path, 0) == 0
+    }
+}
+
+/// Resolves the the code owner for a single file
+func resolveToOwnedFile(fileURL: URL, patterns: [CodeOwnerPattern]) -> OwnedFile {
     // Use `fnmatch()` to match patterns from the bottom up to respect overriding rules
     let match = patterns.reversed().first { entry in
         fnmatch(entry.fnmatchPattern, fileURL.absoluteString, FNM_LEADING_DIR) == 0
@@ -56,7 +89,8 @@ private func resolveToOwnedFile(fileURL: URL, patterns: [CodeOwnerPattern]) -> O
     return OwnedFile(fileURL: fileURL, owners: match?.owners)
 }
 
-private func makeCodeOwnerPattern(line: String, repositoryURL: URL) -> CodeOwnerPattern? {
+/// Processes a single line in a code owner file
+func makeCodeOwnerPattern(line: String, repositoryURL: URL) -> CodeOwnerPattern? {
     let line = line.trimmingCharacters(in: .whitespacesAndNewlines)
     let lineTokens = line.components(separatedBy: .whitespaces)
 
@@ -81,7 +115,7 @@ private func makeCodeOwnerPattern(line: String, repositoryURL: URL) -> CodeOwner
 }
 
 /// Represents an entry in the `CODEOWNERS` file
-private struct CodeOwnerPattern: Codable {
+struct CodeOwnerPattern: Codable {
     let fnmatchPattern: String
     let owners: [String]
 }
