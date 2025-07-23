@@ -37,7 +37,7 @@ You will also need to locate the index store of your project. Both Xcode and Swi
    --library-path      $(xcrun xcodebuild -find-library libIndexStore.dylib) \
    --repository-path   <path-to-repository-containing-code-and-codeowners> \
    --store-path        <path-to-project-index-store> \
-   --format            <json|markdown>
+   --format            <json|markdown> \
    xcresult.json
 
 ```
@@ -52,7 +52,7 @@ You will also need to locate the index store of your project. Both Xcode and Swi
  swift run xcresultowners locate-test \
    --library-path            $(xcrun xcodebuild -find-library libIndexStore.dylib) \
    --store-path              <path-to-project-index-store> \
-   --module-name             <module-name>
+   --module-name             <module-name> \
    --test-identifier-string  <test-identifier-string-from-xcresults-file>
 ```
 
@@ -69,15 +69,21 @@ swift run xcresultowners help
 ```swift
 import XCResultOwnersCore
 
+let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: xcResultSummaryJSON)
 async let ownedFiles = resolveFileOwners(repositoryURL: repositoryURL)
 async let indexStoreDB = IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
-let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: xcResultSummaryJSON)
 
 let ownedFailures = try await resolveFailureOwners(
     testFailures: xcResultSummary.testFailures,
     ownedFiles: ownedFiles,
     indexStoreDB: indexStoreDB
 )
+
+for failure in ownedFailures {
+  print("original failure:", failure.xcFailure)
+  print("path:", failure.path)
+  print("owners:", failure.owners)
+}
 ```
 
 #### Identifying owners of a file
