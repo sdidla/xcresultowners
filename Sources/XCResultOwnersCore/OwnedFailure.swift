@@ -29,7 +29,7 @@ public struct OwnedFailure: Codable, Sendable {
     }
 }
 
-/// Returns a list of failures with resolved a file path, line number and owner
+/// Returns a list of failures with a resolved file path, line number and owner
 public func resolveFailureOwners(
     testFailures: [XCResultSummary.TestFailure],
     ownedFiles: [OwnedFile],

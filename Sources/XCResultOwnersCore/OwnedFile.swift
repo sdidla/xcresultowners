@@ -15,7 +15,8 @@ public struct OwnedFile: Codable, Sendable {
     }
 }
 
-/// The default path to the code owners file. Customizable
+/// The default path to the code owners file. Customizable.
+/// 
 /// Value: `/.github/CODEOWNERS`
 public let defaultCodeOwnersPath = ".github/CODEOWNERS"
 
