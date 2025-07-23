@@ -70,7 +70,7 @@ swift run xcresultowners help
 import XCResultOwnersCore
 
 let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: xcResultSummaryJSON)
-async let ownedFiles = resolveFileOwners(repositoryURL: repositoryURL)
+async let ownedFiles = resolveFileOwners(repositoryURL: repositoryFileURL)
 async let indexStoreDB = IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
 
 let ownedFailures = try await resolveFailureOwners(
