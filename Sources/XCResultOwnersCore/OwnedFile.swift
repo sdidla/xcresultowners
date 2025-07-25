@@ -49,7 +49,7 @@ public let defaultIgnorePatterns = [
 public func resolveFileOwners(
     repositoryURL: URL,
     codeOwnersRelativePath: String = defaultCodeOwnersPath,
-    ignoredPatterns: [String] = defaultIgnorePatterns,
+    ignoredPatterns: [String] = defaultIgnorePatterns
 ) async throws -> [OwnedFile] {
     let codeOwnersURL = repositoryURL.appending(path: codeOwnersRelativePath)
 
