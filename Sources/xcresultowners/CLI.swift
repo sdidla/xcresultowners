@@ -52,21 +52,26 @@ struct Summarize: AsyncParsableCommand {
         let repositoryURL = URL(fileURLWithPath: repositoryPath)
         let xcResultJSONURL = URL(fileURLWithPath: xcResultJSONPath)
 
-        logToStandardError("Initializing database and resolving codeowners...")
-        async let _ownedFiles = resolveFileOwners(repositoryURL: repositoryURL)
-        async let _indexStoreDB = IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
-
-        let (ownedFiles, indexStoreDB) = try await (_ownedFiles, _indexStoreDB)
-        logToStandardError("Initializing database and resolving codeowners... ✓")
-
         let fileData = try Data(contentsOf: xcResultJSONURL)
         let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: fileData)
+        let ownedFailures: [OwnedFailure]
 
-        let ownedFailures = resolveFailureOwners(
-            testFailures: xcResultSummary.testFailures,
-            ownedFiles: ownedFiles,
-            indexStoreDB: indexStoreDB
-        )
+        if xcResultSummary.testFailures.count > 0 {
+            async let ownedFiles = resolveFileOwners(
+                repositoryURL: repositoryURL,
+                codeOwnersRelativePath: codeOwnersRelativePath,
+                ignoredPatterns: ignoredPatterns
+            )
+            async let indexStoreDB = IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
+
+            ownedFailures = try await resolveFailureOwners(
+                testFailures: xcResultSummary.testFailures,
+                ownedFiles: ownedFiles,
+                indexStoreDB: indexStoreDB
+            )
+        } else {
+            ownedFailures = []
+        }
 
         let summary = Summary(
             xcSummary: xcResultSummary,
