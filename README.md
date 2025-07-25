@@ -4,7 +4,7 @@
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsdidla%2Fxcresultowners%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/sdidla/xcresultowners)
 [![GitHub license](https://img.shields.io/github/license/sdidla/xcresultowners)](https://github.com/sdidla/xcresultowners/blob/main/LICENSE)
 
-<img width="100" alt="logo" src="https://github.com/user-attachments/assets/68e44b92-19d2-4099-9d09-b1709b3ed55f" />
+<img width="100" alt="xcresultowners-logo" src="https://github.com/user-attachments/assets/ce5f3f6c-8d48-4d69-bcaa-8d09e43e8493" />
 
 # xcresultowners
 
@@ -145,19 +145,10 @@ print(location.utf8Column)
 
 ## Versioning
 
-This package depends on [`indexstore-db`](https://github.com/swiftlang/indexstore-db) which does not use strict [semantic versioning](https://semver.org). As a result, the SPM package for this project cannot provide a `semver` compatible package. Please use the `revision:` parameter to use a `tag` in your `Package.swift` file directly:
+Though this project uses [semantic versioning](https://semver.org), to be used as an SPM package dependency, you will have to use the `revision:` parameter as the underlying [`indexstore-db`](https://github.com/swiftlang/indexstore-db) project does not use strict semantic versioning.
 
 ```swift
 dependencies: [
    .package(url: "https://github.com/sdidla/xcresultowners", revision: "<#release-tag#>")
 ],
 ```
-   
-The release tags used by this package will follow the following scheme:
-
-```
-v<major>.<minor>.<patch>-<indexstore-db-tag>
-```
-
-where `<major>.<minor>.<patch>` will follow `semver` rules but the full version string will not.
- 
