@@ -4,6 +4,8 @@
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsdidla%2Fxcresultowners%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/sdidla/xcresultowners)
 [![GitHub license](https://img.shields.io/github/license/sdidla/xcresultowners)](https://github.com/sdidla/xcresultowners/blob/main/LICENSE)
 
+<img width="100" alt="logo" src="https://github.com/user-attachments/assets/68e44b92-19d2-4099-9d09-b1709b3ed55f" />
+
 # xcresultowners
 
 This project supplements the test results summary produced by [`xcresulttool`](https://keith.github.io/xcode-man-pages/xcresulttool.1.html) with code ownership defined in GitHub's [`CODEOWNERS`](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) file. The package includes two products:
