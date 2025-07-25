@@ -15,30 +15,35 @@ public struct OwnedFile: Codable, Sendable {
     }
 }
 
-/// The default path to the code owners file. Customizable.
+/// The default path to the code owners file
 /// 
-/// Value: `/.github/CODEOWNERS`
+/// Value:
+/// ```swift
+/// "/.github/CODEOWNERS"
+/// ```
 public let defaultCodeOwnersPath = ".github/CODEOWNERS"
 
-/// The default patterns to ignore. Customizable.
+/// The default patterns to ignore
 ///
 /// Value:
-/// ```
-/// "*/build/*",
-/// "*/Build/*",
-/// "*/.build/*"
+/// ```swift
+/// [
+///   "*/.build/*"
+///   "*/build/*",
+///   "*/Build/*",
+/// ]
 /// ```
 public let defaultIgnorePatterns = [
+    "*/.build/*",
     "*/build/*",
-    "*/Build/*",
-    "*/.build/*"
+    "*/Build/*"
 ]
 
 /// Resolves owners of all files in a repository
 /// - Parameters:
 ///   - repositoryURL: fileURL to a repository
-///   - codeOwnersRelativePath: path to the CODEOWNERS file relative to the repository
-///   - ignoredPatterns: file patterns that should be ignored. Should use patterns used by `fnmatch(_:_:_:)`
+///   - codeOwnersRelativePath: path to the CODEOWNERS file relative to the repository. Defaults to ``defaultCodeOwnersPath``
+///   - ignoredPatterns: file patterns that should be ignored. Expects patterns used by `fnmatch`. Defaults to ``defaultIgnorePatterns``
 /// - Throws: Error when the repository or CODEOWNERS cannot be accessed
 /// - Returns: A list of files with their corresponding owners
 public func resolveFileOwners(

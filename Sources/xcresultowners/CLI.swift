@@ -25,16 +25,27 @@ struct Summarize: AsyncParsableCommand {
     @Option(name: .shortAndLong, help: "Output format")
     var format: OutputFormat = .markdown
 
-    @Option(name: .shortAndLong,help: "Path to libIndexStore.dylib. Use $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun.")
+    @Option(name: .shortAndLong, help: "Path to libIndexStore.dylib. Use $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun.")
     var libraryPath: String = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib"
 
     @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of an Xcode project")
     var storePath: String
 
-    @Option(name: .shortAndLong,help: "Path to the repository that contains github.com CODEOWNERS and source files")
+    @Option(name: .shortAndLong, help: "Path to the repository that contains github.com CODEOWNERS and source files")
     var repositoryPath: String
 
-    @Argument(help: "Path to the xcresult summary obtained using `xcresulttool get test-results summary`")
+    @Option(name: .shortAndLong, help: "Path to the code owners file relative to the repository")
+    var codeOwnersRelativePath: String = defaultCodeOwnersPath
+
+    @Option(name: .shortAndLong, help: "File patterns to ignore while resolving file owners. Use patterns used by `fnmatch`")
+    var ignoredPatterns: [String] = defaultIgnorePatterns
+
+    @Argument(
+        help: .init(
+            "Path to the xcresult summary obtained using `xcresulttool get test-results summary`",
+            valueName: "xcresult-json-summary-path"
+        )
+    )
     var xcResultJSONPath: String
 
     mutating func run() async throws {
@@ -79,7 +90,7 @@ struct Summarize: AsyncParsableCommand {
 }
 
 struct LocateTest: AsyncParsableCommand {
-    @Option(name: .shortAndLong,help: "Path to libIndexStore.dylib. Use can pass in  $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun")
+    @Option(name: .shortAndLong, help: "Path to libIndexStore.dylib. Use can pass in  $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun")
     var libraryPath: String = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib"
 
     @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of the project")
@@ -122,12 +133,22 @@ struct FileOwners: AsyncParsableCommand {
     @Option(name: .shortAndLong, help: "Path to the repository that contains github.com CODEOWNERS and source files")
     var repositoryPath: String
 
+    @Option(name: .shortAndLong, help: "Path to the code owners file relative to the repository")
+    var codeOwnersRelativePath: String = defaultCodeOwnersPath
+
+    @Option(name: .shortAndLong, help: "File patterns to ignore while resolving file owners. Use patterns used by `fnmatch`")
+    var ignoredPatterns: [String] = defaultIgnorePatterns
+
     @Option(name: .shortAndLong, help: "Optionally specify the paths of files you are interested in")
     var filePaths: [String] = []
 
     mutating func run() async throws {
         let repositoryURL = URL(fileURLWithPath: repositoryPath)
-        let allOwnedFiles = try await resolveFileOwners(repositoryURL: repositoryURL)
+        let allOwnedFiles = try await resolveFileOwners(
+            repositoryURL: repositoryURL,
+            codeOwnersRelativePath: codeOwnersRelativePath,
+            ignoredPatterns: ignoredPatterns
+        )
 
         let requestedOwnedFiles = filePaths.map { filePath in
             let fileURL = URL(fileURLWithPath: filePath)
