@@ -20,7 +20,7 @@ public extension IndexStoreDB {
 
         try self.init(
             storePath: storePath,
-            databasePath: temporaryDatabaseURL.path(),
+            databasePath: temporaryDatabaseURL.path,
             library: .init(dylibPath: libraryPath),
             waitUntilDoneInitializing: true
         )

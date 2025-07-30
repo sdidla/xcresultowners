@@ -49,8 +49,8 @@ struct Summarize: AsyncParsableCommand {
     var xcResultJSONPath: String
 
     mutating func run() async throws {
-        let repositoryURL = URL(fileURLWithPath: repositoryPath)
-        let xcResultJSONURL = URL(fileURLWithPath: xcResultJSONPath)
+        let repositoryURL = URL(filePath: repositoryPath)
+        let xcResultJSONURL = URL(filePath: xcResultJSONPath)
 
         let fileData = try Data(contentsOf: xcResultJSONURL)
         let xcResultSummary = try JSONDecoder().decode(XCResultSummary.self, from: fileData)
@@ -148,7 +148,7 @@ struct FileOwners: AsyncParsableCommand {
     var filePaths: [String] = []
 
     mutating func run() async throws {
-        let repositoryURL = URL(fileURLWithPath: repositoryPath)
+        let repositoryURL = URL(filePath: repositoryPath)
         let allOwnedFiles = try await resolveFileOwners(
             repositoryURL: repositoryURL,
             codeOwnersRelativePath: codeOwnersRelativePath,
@@ -156,7 +156,7 @@ struct FileOwners: AsyncParsableCommand {
         )
 
         let requestedOwnedFiles = filePaths.map { filePath in
-            let fileURL = URL(fileURLWithPath: filePath)
+            let fileURL = URL(filePath: filePath)
             let ownedFile = allOwnedFiles.first { $0.fileURL == fileURL }
             return ownedFile ?? OwnedFile(fileURL: fileURL, owners: nil)
         }

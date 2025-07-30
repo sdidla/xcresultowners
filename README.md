@@ -93,7 +93,7 @@ for failure in ownedFailures {
 ```swift
 import XCResultOwnersCore
 
-let repositoryURL = URL(fileURLWithPath: repositoryPath)
+let repositoryURL = URL(filePath: repositoryPath)
 let ownedFiles = try await resolveFileOwners(repositoryURL: repositoryURL)
 
 for file in ownedFiles {

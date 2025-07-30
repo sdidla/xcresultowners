@@ -47,7 +47,7 @@ public func resolveFailureOwners(
 
         let path = location.path
         let line = location.line
-        let fileURL = URL(fileURLWithPath: location.path)
+        let fileURL = URL(filePath: location.path)
         let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
         let owners = ownedFile?.owners
 

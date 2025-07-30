@@ -15,7 +15,7 @@ class TestData {
     }
 
     static var testProjectURL: URL {
-        URL(fileURLWithPath: #filePath)
+        URL(filePath: #filePath)
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appending(path: "TestData")
