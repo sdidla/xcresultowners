@@ -68,3 +68,64 @@ public struct XCResultSummary: Codable, Sendable {
         case unknown = "unknown"
     }
 }
+
+/// Represents the original schema produced by `xcresulttool`
+///
+/// [Xcode 16.3](https://developer.apple.com/documentation/xcode-release-notes/xcode-16_3-release-notes#xcresulttool) ships with a new version of xcresulttool that has a clean JSON response
+///
+/// Run `xcrun xcresulttool help get test-results tests` to see the full JSON schema
+public struct XCResultTests: Codable, Sendable {
+    public let testNodes: [TestNode]
+
+    public init(testNodes: [TestNode]) {
+        self.testNodes = testNodes
+    }
+
+    public func allTestCases() -> [TestNode] {
+        testNodes.flatMap { $0.allTestCases() }
+    }
+
+    public struct TestNode: Codable, Sendable {
+        public let name: String
+        public let nodeType: NodeType
+        public let nodeIdentifier: String?
+        public let children: [TestNode]?
+
+        public init(name: String, nodeType: NodeType, nodeIdentifier: String?, children: [TestNode]?) {
+            self.name = name
+            self.nodeType = nodeType
+            self.nodeIdentifier = nodeIdentifier
+            self.children = children
+        }
+
+        func allTestCases() -> [XCResultTests.TestNode] {
+            if let children {
+                children.filter(\.isTestCase) + children.flatMap { $0.allTestCases() }
+            } else {
+                []
+            }
+        }
+
+        var isTestCase: Bool {
+            nodeType == .testCase
+        }
+    }
+
+    public enum NodeType: String, Codable, Sendable {
+        case testPlan = "Test Plan"
+        case unitTestBundle = "Unit test bundle"
+        case uiTestBundle = "UI test bundle"
+        case testSuite = "Test Suite"
+        case testCase = "Test Case"
+        case device = "Device"
+        case testPlanConfiguration = "Test Plan Configuration"
+        case arguments = "Arguments"
+        case repetition = "Repetition"
+        case testCaseRun = "Test Case Run"
+        case failureMessage = "Failure Message"
+        case sourceCodeReference = "Source Code Reference"
+        case attachment = "Attachment"
+        case expression = "Expression"
+        case testValue = "Test Value"
+    }
+}

@@ -1,6 +1,6 @@
 import Foundation
 import ArgumentParser
-import IndexStoreDB
+@preconcurrency import IndexStoreDB
 import XCResultOwnersCore
 
 @main struct XCResultOwners: AsyncParsableCommand {
@@ -10,6 +10,7 @@ import XCResultOwnersCore
         subcommands: [
             Summarize.self,
             LocateTest.self,
+            LocateAllTests.self,
             FileOwners.self
         ],
         defaultSubcommand: Summarize.self
@@ -110,7 +111,7 @@ struct LocateTest: AsyncParsableCommand {
     mutating func run() async throws {
         let indexStoreDB = try await IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
 
-        let location = indexStoreDB.locate(
+        let location = await indexStoreDB.locate(
             testIdentifierString: testIdentifierString,
             moduleName: moduleName
         )
@@ -131,6 +132,46 @@ struct LocateTest: AsyncParsableCommand {
         let data = try JSONSerialization.data(withJSONObject: result, options: options)
         let json = String(decoding: data, as: UTF8.self)
         print(json)
+    }
+}
+
+struct LocateAllTests: AsyncParsableCommand {
+    @Option(name: .shortAndLong, help: "Path to libIndexStore.dylib. Use can pass in  $(xcrun xcodebuild -find-library libIndexStore.dylib) to auto-detect using xcrun")
+    var libraryPath: String = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libIndexStore.dylib"
+
+    @Option(name: .shortAndLong, help: "Path to the index store. Usually at `/Index.noindex/DataStore` in the derived data folder of the project")
+    var storePath: String
+
+    @Argument(
+        help: .init(
+            "Path to the xcresult tests file obtained using `xcresulttool get test-results tests`",
+            valueName: "xcresult-tests-json-path"
+        )
+    )
+    var xcResultJSONPath: String
+
+    mutating func run() async throws {
+        let xcResultJSONURL = URL(filePath: xcResultJSONPath)
+        let fileData = try Data(contentsOf: xcResultJSONURL)
+        let xcResultTests = try JSONDecoder().decode(XCResultTests.self, from: fileData)
+
+        let allTests = xcResultTests.allTestCases()
+        let identifiers = allTests.compactMap { $0.nodeIdentifier! }
+        let indexStoreDB = try await IndexStoreDB(storePath: storePath, libraryPath: libraryPath)
+
+        await withTaskGroup { group in
+            for id in identifiers {
+                group.addTask {
+                    if let location = await indexStoreDB.locate(testIdentifierString: id, moduleName: nil) {
+                        print(location.moduleName, location.path, location.line)
+                    } else {
+                        print("‼️ location not found: ", id)
+                    }
+                }
+            }
+        }
+
+        print(allTests.count)
     }
 }
 

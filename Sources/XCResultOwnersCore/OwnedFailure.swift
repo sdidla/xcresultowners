@@ -34,23 +34,28 @@ public func resolveFailureOwners(
     testFailures: [XCResultSummary.TestFailure],
     ownedFiles: [OwnedFile],
     indexStoreDB: IndexStoreDB
-) -> [OwnedFailure] {
-    testFailures.map { failure in
-        let location = indexStoreDB.locate(
+) async -> [OwnedFailure] {
+
+    var result: [OwnedFailure] = []
+
+    for failure in testFailures {
+        let location = await indexStoreDB.locate(
             testIdentifierString: failure.testIdentifierString,
             moduleName: failure.targetName
         )
 
-        guard let location else {
-            return OwnedFailure(xcFailure: failure, path: nil, line: nil, owners: nil)
+        if let location {
+            let path = location.path
+            let line = location.line
+            let fileURL = URL(filePath: location.path)
+            let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
+            let owners = ownedFile?.owners
+
+            result.append(OwnedFailure(xcFailure: failure, path: path, line: line, owners: owners))
+        } else {
+            result.append(OwnedFailure(xcFailure: failure, path: nil, line: nil, owners: nil))
         }
-
-        let path = location.path
-        let line = location.line
-        let fileURL = URL(filePath: location.path)
-        let ownedFile = ownedFiles.first { $0.fileURL == fileURL }
-        let owners = ownedFile?.owners
-
-        return OwnedFailure(xcFailure: failure, path: path, line: line, owners: owners)
     }
+
+    return result
 }
