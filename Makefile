@@ -1,14 +1,17 @@
-localbin ?= /usr/local/bin
+prefix ?= /usr/local
+bindir = $(prefix)/bin
 
-install:
+build:
 	swift build -c release --disable-sandbox
-	install -d "$(localbin)"
-	install ".build/release/xcresultowners" "$(localbin)"
+
+install: build
+	install -d "$(bindir)"
+	install ".build/release/xcresultowners" "$(bindir)"
 
 uninstall:
-	rm -rf "$(localbin)/xcresultowners"
+	rm -rf "$(bindir)/xcresultowners"
 
 clean:
 	rm -rf .build
 
-.PHONY: install uninstall clean
+.PHONY: build install uninstall clean
