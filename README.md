@@ -13,6 +13,14 @@ This project supplements the test results summary produced by [`xcresulttool`](h
 - `xcresultowners`: The command line tool to identify owners of failed tests.
 - `XCResultOwnersCore`: The library that can be used to build your own macOS tool.
 
+## Installation
+
+Install the command line tool using [Homebrew](https://brew.sh):
+
+```shell
+brew install sdidla/formulae/xcresultowners
+```
+
 ## Usage
 
 You will need the path to `libIndexStore.dylib` that is installed with Xcode. This can be located using:
